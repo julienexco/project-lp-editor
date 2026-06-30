@@ -35,7 +35,13 @@ function readLocalPage(id: string): PageRecord {
   }
   const page = JSON.parse(readFileSync(storePath, 'utf-8')) as PageRecord
   if (page.id !== id) return { ...loadSeed(), id }
-  return { ...page, blocks: normalizePageBlocks(page.blocks) }
+  return {
+    ...page,
+    blocks: normalizePageBlocks(page.blocks),
+    config: page.config ?? {},
+    meta: page.meta ?? {},
+    schema_version: page.schema_version ?? '1.0.0',
+  }
 }
 
 function writeLocalPage(page: PageRecord) {
@@ -44,40 +50,62 @@ function writeLocalPage(page: PageRecord) {
   writeFileSync(getLocalStorePath(), JSON.stringify(page, null, 2))
 }
 
-function getSupabaseAdmin() {
+function isSupabaseConfigured(): boolean {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY
-  if (!url || !key || url.includes('your-project')) return null
-  return createClient(url, key)
+  if (!url || !key) return false
+  if (url.includes('your-project')) return false
+  if (key.includes('your-service-role-key')) return false
+  return true
+}
+
+function getSupabaseAdmin() {
+  if (!isSupabaseConfigured()) return null
+  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+}
+
+function withDefaults(page: PageRecord): PageRecord {
+  return {
+    ...page,
+    blocks: normalizePageBlocks(page.blocks),
+    config: page.config ?? {},
+    meta: page.meta ?? {},
+    schema_version: page.schema_version ?? '1.0.0',
+  }
 }
 
 export async function getPage(id: string): Promise<PageRecord | null> {
   const supabase = getSupabaseAdmin()
   if (supabase) {
     const { data, error } = await supabase.from('pages').select('*').eq('id', id).single()
-    if (error || !data) return readLocalPage(id)
-    return data as PageRecord
+    if (!error && data) return withDefaults(data as PageRecord)
   }
   return readLocalPage(id)
 }
 
 export async function updatePageBlocks(id: string, blocks: BlockInstance[]): Promise<PageRecord> {
-  const supabase = getSupabaseAdmin()
+  const normalizedBlocks = normalizePageBlocks(blocks)
   const updatedAt = new Date().toISOString()
+  const supabase = getSupabaseAdmin()
 
   if (supabase) {
     const { data, error } = await supabase
       .from('pages')
-      .update({ blocks, updated_at: updatedAt })
+      .update({ blocks: normalizedBlocks, updated_at: updatedAt })
       .eq('id', id)
       .select('*')
       .single()
-    if (error || !data) throw new Error(error?.message ?? 'Update failed')
-    return data as PageRecord
+
+    if (!error && data) return withDefaults({ ...(data as PageRecord), updated_at: updatedAt })
+    console.warn('[page-store] Supabase save failed, falling back to local file:', error?.message)
   }
 
   const page = readLocalPage(id)
-  const next = { ...page, blocks, updated_at: updatedAt }
+  const next: PageRecord = {
+    ...page,
+    blocks: normalizedBlocks,
+    updated_at: updatedAt,
+  }
   writeLocalPage(next)
   return next
 }

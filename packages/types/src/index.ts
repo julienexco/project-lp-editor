@@ -99,6 +99,7 @@ export type PageRecord = {
   config: Record<string, unknown>
   meta: Record<string, unknown>
   schema_version: string
+  updated_at?: string
 }
 
 export type ContentEditHandler = (field: string, value: string) => void

@@ -11,10 +11,15 @@ import { StylePanel } from './StylePanel'
 import { TypographyPanel } from './TypographyPanel'
 
 const PANEL_STORAGE_KEY = 'lp-studio-panel-open'
+const SAVE_DEBOUNCE_MS = 500
 
 type EditorShellProps = {
   pageId: string
   initialPage: PageRecord
+}
+
+function formatSavedAt(iso: string): string {
+  return new Date(iso).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 }
 
 export function EditorShell({ pageId, initialPage }: EditorShellProps) {
@@ -25,8 +30,17 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
   const [selectedId, setSelectedId] = useState<string | null>(initialPage.blocks[0]?.id ?? null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [lastSavedAt, setLastSavedAt] = useState<string | null>(initialPage.updated_at ?? null)
   const [panelOpen, setPanelOpen] = useState(true)
+
+  const blocksRef = useRef(page.blocks)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const saveInFlightRef = useRef(false)
+  const needsResaveRef = useRef(false)
+
+  useEffect(() => {
+    blocksRef.current = page.blocks
+  }, [page.blocks])
 
   useEffect(() => {
     const stored = localStorage.getItem(PANEL_STORAGE_KEY)
@@ -46,40 +60,68 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
     [page.blocks, selectedId],
   )
 
-  const persist = useCallback(
-    (blocks: BlockInstance[]) => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
-      debounceRef.current = setTimeout(async () => {
-        setSaving(true)
-        setError(null)
-        try {
-          const res = await fetch(`/api/pages/${pageId}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ blocks }),
-          })
-          if (!res.ok) throw new Error('Échec de la sauvegarde')
-          const updated = (await res.json()) as PageRecord
-          setPage({ ...updated, blocks: normalizePageBlocks(updated.blocks) })
-        } catch {
-          setError('Impossible de sauvegarder')
-        } finally {
-          setSaving(false)
+  const runSave = useCallback(async () => {
+    if (saveInFlightRef.current) {
+      needsResaveRef.current = true
+      return
+    }
+
+    saveInFlightRef.current = true
+    setSaving(true)
+    setError(null)
+
+    try {
+      do {
+        needsResaveRef.current = false
+        const blocksToSave = blocksRef.current
+
+        const res = await fetch(`/api/pages/${pageId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ blocks: blocksToSave }),
+        })
+
+        if (!res.ok) {
+          const payload = (await res.json().catch(() => null)) as { error?: string } | null
+          throw new Error(payload?.error ?? 'Échec de la sauvegarde')
         }
-      }, 500)
-    },
-    [pageId],
-  )
+
+        const updated = (await res.json()) as PageRecord
+        setLastSavedAt(updated.updated_at ?? new Date().toISOString())
+      } while (needsResaveRef.current)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Impossible de sauvegarder')
+    } finally {
+      saveInFlightRef.current = false
+      setSaving(false)
+    }
+  }, [pageId])
+
+  const scheduleSave = useCallback(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      void runSave()
+    }, SAVE_DEBOUNCE_MS)
+  }, [runSave])
+
+  const flushSave = useCallback(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current)
+      debounceRef.current = null
+    }
+    void runSave()
+  }, [runSave])
 
   const updateBlocks = useCallback(
     (updater: (blocks: BlockInstance[]) => BlockInstance[]) => {
       setPage((prev) => {
         const nextBlocks = updater(prev.blocks)
-        persist(nextBlocks)
+        blocksRef.current = nextBlocks
         return { ...prev, blocks: nextBlocks }
       })
+      scheduleSave()
     },
-    [persist],
+    [scheduleSave],
   )
 
   const updateContent = (field: string, value: unknown) => {
@@ -134,10 +176,33 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
   }
 
   useEffect(() => {
+    const onBeforeUnload = () => {
+      if (!debounceRef.current) return
+      clearTimeout(debounceRef.current)
+      debounceRef.current = null
+      const blocks = blocksRef.current
+      fetch(`/api/pages/${pageId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blocks }),
+        keepalive: true,
+      }).catch(() => undefined)
+    }
+
+    window.addEventListener('beforeunload', onBeforeUnload)
     return () => {
+      window.removeEventListener('beforeunload', onBeforeUnload)
       if (debounceRef.current) clearTimeout(debounceRef.current)
     }
-  }, [])
+  }, [pageId])
+
+  const saveStatus = saving
+    ? 'Sauvegarde…'
+    : error
+      ? error
+      : lastSavedAt
+        ? `Sauvegardé à ${formatSavedAt(lastSavedAt)}`
+        : 'Brouillon · non sauvegardé'
 
   return (
     <div className="flex h-screen flex-col bg-[#1A3066]">
@@ -146,8 +211,25 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
           <p className="text-xs uppercase tracking-widest text-white/60">LP Studio MVP</p>
           <h1 className="text-lg font-semibold">{page.name}</h1>
         </div>
-        <div className="text-sm text-white/80">
-          {saving ? 'Sauvegarde…' : error ? <span className="text-[#E63946]">{error}</span> : 'Draft · local'}
+        <div className="flex items-center gap-3 text-sm">
+          {!saving && !error && lastSavedAt ? (
+            <span className="inline-flex items-center gap-1.5 text-emerald-300" aria-live="polite">
+              <CheckIcon />
+              {saveStatus}
+            </span>
+          ) : (
+            <span className={error ? 'text-[#E63946]' : 'text-white/80'} aria-live="polite">
+              {saveStatus}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={flushSave}
+            disabled={saving}
+            className="rounded-md border border-white/20 px-2.5 py-1 text-xs font-medium text-white/90 transition hover:bg-white/10 disabled:opacity-50"
+          >
+            Sauvegarder
+          </button>
         </div>
       </header>
 
@@ -223,7 +305,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#eef2f6]">
           <div className="flex items-center justify-between gap-3 border-b border-[#1A3066]/10 bg-white px-4 py-2">
             <p className="text-xs text-[#5C6B8A]">
-              Aperçu responsive — double-cliquez un texte pour l&apos;éditer · redimensionnez pour mobile / tablette
+              Aperçu responsive — double-cliquez un texte pour l&apos;éditer · sauvegarde auto à chaque modification
             </p>
             {!panelOpen && selectedBlock ? (
               <p className="truncate text-xs font-medium text-[#1A3066]">
@@ -242,6 +324,14 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
         </main>
       </div>
     </div>
+  )
+}
+
+function CheckIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M5 12l5 5L20 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   )
 }
 
