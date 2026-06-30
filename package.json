@@ -1,0 +1,20 @@
+{
+  "name": "lp-studio",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @lp-studio/editor",
+    "build": "npm run build -w @lp-studio/editor",
+    "validate": "npx tsx scripts/validate-blocks.ts && npx tsx scripts/validate-registry.ts"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "tsx": "^4.20.3",
+    "typescript": "^5.8.3",
+    "@types/node": "^22.15.32"
+  },
+  "packageManager": "pnpm@9.15.0"
+}

@@ -1,0 +1,105 @@
+{
+  "id": "00000000-0000-4000-8000-000000000001",
+  "name": "Upscaly Consulting",
+  "slug": "upscaly-consulting",
+  "status": "draft",
+  "blocks": [
+    {
+      "id": "b-hero-001",
+      "type": "hero",
+      "order": 0,
+      "content": {
+        "eyebrow": "Conseil · Upscaly Consulting",
+        "title": "Votre croissance stagne ?",
+        "titleHighlight": "On accélère.",
+        "subtitle": "Des systèmes d'acquisition qui tournent, pas des campagnes qui s'essoufflent. Audit gratuit pour repartir avec un plan clair.",
+        "ctaLabel": "Réserver mon audit gratuit",
+        "ctaHref": "#contact",
+        "showLogo": true,
+        "stats": [
+          { "value": "50+", "label": "clients accompagnés" },
+          { "value": "10 ans", "label": "sur le terrain" },
+          { "value": "3", "label": "leviers clés" },
+          { "value": "45 min", "label": "audit offert" }
+        ]
+      },
+      "style": {
+        "align": "center",
+        "color": { "bg": "surface", "text": "navy" },
+        "font": { "family": "poppins", "size": "xl", "weight": "bold" },
+        "spacing": { "marginY": "loose", "paddingX": "normal" },
+        "animation": "fade-in"
+      }
+    },
+    {
+      "id": "b-services-001",
+      "type": "featureGrid",
+      "order": 1,
+      "content": {
+        "sectionTitle": "Trois façons de bosser ensemble",
+        "items": [
+          {
+            "title": "Coaching",
+            "tagline": "Pour le dirigeant qui exécute",
+            "description": "Tu exécutes, je structure la stratégie et les pièges à éviter. Sur mesure."
+          },
+          {
+            "title": "Accompagnement",
+            "tagline": "Pour l'équipe qui veut avancer vite",
+            "description": "On avance ensemble, semaine après semaine. Le meilleur ratio vitesse / autonomie."
+          },
+          {
+            "title": "Pilotage",
+            "tagline": "Pour celui qui veut déléguer",
+            "description": "Je pilote la croissance de bout en bout. Stratégie, exécution, automatisation."
+          }
+        ]
+      },
+      "style": {
+        "align": "left",
+        "color": { "bg": "white", "text": "navy" },
+        "font": { "family": "poppins", "size": "md", "weight": "normal" },
+        "spacing": { "marginY": "normal", "paddingX": "normal" },
+        "animation": "none"
+      }
+    },
+    {
+      "id": "b-cta-001",
+      "type": "cta",
+      "order": 2,
+      "content": {
+        "title": "45 minutes pour y voir clair.",
+        "description": "On scanne votre situation, on identifie ce qui bloque, vous repartez avec un plan d'action — même si on ne travaille pas ensemble.",
+        "buttonLabel": "Réserver mon audit gratuit",
+        "buttonHref": "#contact"
+      },
+      "style": {
+        "align": "center",
+        "color": { "bg": "navy", "text": "white" },
+        "font": { "family": "poppins", "size": "lg", "weight": "bold" },
+        "spacing": { "marginY": "loose", "paddingX": "normal" },
+        "animation": "none"
+      }
+    },
+    {
+      "id": "b-footer-001",
+      "type": "footer",
+      "order": 3,
+      "content": {
+        "brandName": "Upscaly Consulting",
+        "email": "contact@upscaly.com",
+        "linkedinUrl": "https://linkedin.com",
+        "linkedinLabel": "LinkedIn",
+        "copyright": "© 2026 Upscaly Consulting",
+        "showLogo": true
+      },
+      "style": {
+        "align": "left",
+        "color": { "bg": "navy", "text": "white" },
+        "font": { "family": "poppins", "size": "sm", "weight": "normal" },
+        "spacing": { "marginY": "tight", "paddingX": "normal" },
+        "animation": "none"
+      }
+    }
+  ]
+}
