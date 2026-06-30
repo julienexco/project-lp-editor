@@ -6,6 +6,12 @@
 
 :root {
   --font-poppins: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-inter: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-open-sans: "Open Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-roboto: "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-montserrat: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-playfair-display: "Playfair Display", ui-serif, Georgia, serif;
+  --font-lora: "Lora", ui-serif, Georgia, serif;
   --color-navy: #1a3066;
   --color-surface: #e3f2fd;
   --color-accent: #e63946;

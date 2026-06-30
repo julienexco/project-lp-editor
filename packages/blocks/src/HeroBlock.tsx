@@ -1,10 +1,9 @@
 import type { BlockProps } from '@lp-studio/types'
+import { resolveTypographyRole } from '@lp-studio/registry'
 import {
   accentButtonClass,
   containerClass,
-  eyebrowClass,
   ghostButtonClass,
-  headingClass,
   highlightClass,
   mutedClass,
   navBarClass,
@@ -15,19 +14,28 @@ import {
 import { BrandLogo } from './BrandLogo'
 import { AccentBar, HeroGridPattern } from './decorations'
 import { EditableText } from './EditableText'
+import { typoProps } from './typo'
 
 export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero'>) {
   const centered = style.align === 'center'
+  const typo = {
+    eyebrow: resolveTypographyRole('hero', style, 'eyebrow'),
+    h1: resolveTypographyRole('hero', style, 'h1'),
+    body: resolveTypographyRole('hero', style, 'body'),
+    stat: resolveTypographyRole('hero', style, 'stat'),
+    caption: resolveTypographyRole('hero', style, 'caption'),
+  }
+  const t = {
+    eyebrow: typoProps(typo.eyebrow, 'eyebrow', mutedClass()),
+    h1: typoProps(typo.h1, 'h1'),
+    body: typoProps(typo.body, 'body', mutedClass()),
+    stat: typoProps(typo.stat, 'stat', 'text-[#1A3066]'),
+    caption: typoProps(typo.caption, 'caption', mutedClass()),
+  }
 
   const ctaButton = editable ? (
     <span className={accentButtonClass()}>
-      <EditableText
-        value={content.ctaLabel}
-        field="ctaLabel"
-        editable={editable}
-        onEdit={onEdit}
-        as="span"
-      />
+      <EditableText value={content.ctaLabel} field="ctaLabel" editable={editable} onEdit={onEdit} as="span" />
     </span>
   ) : (
     <a href={content.ctaHref} className={accentButtonClass()}>
@@ -56,7 +64,8 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
           field={`stats.${index}.value`}
           editable={editable}
           onEdit={onEdit}
-          className="text-2xl font-bold tracking-tight text-[#1A3066] sm:text-3xl"
+          className={t.stat.className}
+          style={t.stat.style}
           as="p"
         />
         <EditableText
@@ -64,11 +73,35 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
           field={`stats.${index}.label`}
           editable={editable}
           onEdit={onEdit}
-          className={`mt-1 text-xs leading-snug sm:text-sm ${mutedClass()}`}
+          className={`mt-1 ${t.caption.className}`}
+          style={t.caption.style}
           as="p"
         />
       </div>
     ))
+
+  const titleBlock = (
+    <>
+      <EditableText
+        value={content.title}
+        field="title"
+        editable={editable}
+        onEdit={onEdit}
+        className={t.h1.className}
+        style={t.h1.style}
+        as="span"
+      />
+      <EditableText
+        value={content.titleHighlight}
+        field="titleHighlight"
+        editable={editable}
+        onEdit={onEdit}
+        className={[centered ? `mt-2 block ${highlightClass()}` : highlightClass(), t.h1.className].join(' ')}
+        style={t.h1.style}
+        as="span"
+      />
+    </>
+  )
 
   return (
     <section className={[sectionTheme(style), 'relative overflow-hidden'].join(' ')}>
@@ -103,26 +136,13 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
                   field="eyebrow"
                   editable={editable}
                   onEdit={onEdit}
-                  className={eyebrowClass()}
+                  className={t.eyebrow.className}
+                  style={t.eyebrow.style}
                   as="p"
                 />
               </div>
-              <h1 className={headingClass(style)}>
-                <EditableText
-                  value={content.title}
-                  field="title"
-                  editable={editable}
-                  onEdit={onEdit}
-                  as="span"
-                />
-                <EditableText
-                  value={content.titleHighlight}
-                  field="titleHighlight"
-                  editable={editable}
-                  onEdit={onEdit}
-                  className={`mt-2 block ${highlightClass()}`}
-                  as="span"
-                />
+              <h1 className={t.h1.className} style={t.h1.style}>
+                {titleBlock}
               </h1>
               <EditableText
                 value={content.subtitle}
@@ -130,7 +150,8 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
                 editable={editable}
                 onEdit={onEdit}
                 multiline
-                className={`mt-6 max-w-2xl text-base leading-relaxed sm:mt-7 sm:text-lg ${mutedClass()}`}
+                className={`mt-6 max-w-2xl sm:mt-7 ${t.body.className}`}
+                style={t.body.style}
                 as="p"
               />
               <div className="mt-8 sm:mt-10">{ctaButton}</div>
@@ -148,20 +169,13 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
                     field="eyebrow"
                     editable={editable}
                     onEdit={onEdit}
-                    className={eyebrowClass()}
+                    className={t.eyebrow.className}
+                    style={t.eyebrow.style}
                     as="p"
                   />
                 </div>
-                <h1 className={headingClass(style)}>
-                  <EditableText value={content.title} field="title" editable={editable} onEdit={onEdit} as="span" />{' '}
-                  <EditableText
-                    value={content.titleHighlight}
-                    field="titleHighlight"
-                    editable={editable}
-                    onEdit={onEdit}
-                    className={highlightClass()}
-                    as="span"
-                  />
+                <h1 className={t.h1.className} style={t.h1.style}>
+                  {titleBlock}
                 </h1>
                 <EditableText
                   value={content.subtitle}
@@ -169,7 +183,8 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
                   editable={editable}
                   onEdit={onEdit}
                   multiline
-                  className={`max-w-xl text-base leading-relaxed sm:text-lg ${mutedClass()}`}
+                  className={`max-w-xl ${t.body.className}`}
+                  style={t.body.style}
                   as="p"
                 />
                 {ctaButton}

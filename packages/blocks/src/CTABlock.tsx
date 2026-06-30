@@ -1,27 +1,30 @@
 import type { BlockProps } from '@lp-studio/types'
+import { resolveTypographyRole } from '@lp-studio/registry'
 import {
   accentButtonClass,
   containerClass,
   ctaPanelClass,
   sectionSpacing,
   sectionTheme,
-  sectionTitleClass,
 } from '@lp-studio/tokens'
 import { EditableText } from './EditableText'
+import { typoProps } from './typo'
 
 export function CTABlock({ content, style, editable, onEdit }: BlockProps<'cta'>) {
   const centered = style.align === 'center'
   const onNavy = style.color.bg === 'navy'
+  const typo = {
+    h2: resolveTypographyRole('cta', style, 'h2'),
+    body: resolveTypographyRole('cta', style, 'body'),
+  }
+  const t = {
+    h2: typoProps(typo.h2, 'h2', 'max-w-2xl', centered ? 'mx-auto' : ''),
+    body: typoProps(typo.body, 'body', 'max-w-2xl sm:mt-5', onNavy ? 'text-white/85' : 'text-[#5C6B8A]', centered ? 'mx-auto' : ''),
+  }
 
   const ctaButton = editable ? (
     <span className={accentButtonClass(onNavy ? 'onDark' : 'default')}>
-      <EditableText
-        value={content.buttonLabel}
-        field="buttonLabel"
-        editable={editable}
-        onEdit={onEdit}
-        as="span"
-      />
+      <EditableText value={content.buttonLabel} field="buttonLabel" editable={editable} onEdit={onEdit} as="span" />
     </span>
   ) : (
     <a href={content.buttonHref} className={accentButtonClass(onNavy ? 'onDark' : 'default')}>
@@ -48,7 +51,8 @@ export function CTABlock({ content, style, editable, onEdit }: BlockProps<'cta'>
             field="title"
             editable={editable}
             onEdit={onEdit}
-            className={`max-w-2xl ${sectionTitleClass(style)} ${centered ? 'mx-auto' : ''}`}
+            className={t.h2.className}
+            style={t.h2.style}
             as="h2"
           />
           <EditableText
@@ -57,12 +61,8 @@ export function CTABlock({ content, style, editable, onEdit }: BlockProps<'cta'>
             editable={editable}
             onEdit={onEdit}
             multiline
-            className={[
-              'mt-4 max-w-2xl text-sm leading-relaxed sm:mt-5 sm:text-base',
-              'font-[family-name:var(--font-poppins)]',
-              onNavy ? 'text-white/85' : 'text-[#5C6B8A]',
-              centered ? 'mx-auto' : '',
-            ].join(' ')}
+            className={`mt-4 ${t.body.className}`}
+            style={t.body.style}
             as="p"
           />
           <div className="mt-8 sm:mt-10">{ctaButton}</div>

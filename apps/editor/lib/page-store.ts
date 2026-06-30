@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
 import type { BlockInstance, PageRecord } from '@lp-studio/types'
+import { normalizePageBlocks } from '@lp-studio/registry'
 import { createClient } from '@supabase/supabase-js'
 
 const DEFAULT_PAGE_ID = '00000000-0000-4000-8000-000000000001'
@@ -15,6 +16,7 @@ function loadSeed(): PageRecord {
   const parsed = JSON.parse(raw) as PageRecord
   return {
     ...parsed,
+    blocks: normalizePageBlocks(parsed.blocks),
     config: parsed.config ?? {},
     meta: parsed.meta ?? {},
     schema_version: parsed.schema_version ?? '1.0.0',
@@ -33,7 +35,7 @@ function readLocalPage(id: string): PageRecord {
   }
   const page = JSON.parse(readFileSync(storePath, 'utf-8')) as PageRecord
   if (page.id !== id) return { ...loadSeed(), id }
-  return page
+  return { ...page, blocks: normalizePageBlocks(page.blocks) }
 }
 
 function writeLocalPage(page: PageRecord) {

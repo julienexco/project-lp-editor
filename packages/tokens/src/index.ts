@@ -6,6 +6,8 @@ import type {
   PaletteToken,
   SizeToken,
   SpacingToken,
+  TypographyRole,
+  TypographyRoleStyle,
   WeightToken,
 } from '@lp-studio/types'
 
@@ -18,6 +20,26 @@ export const brandColors = {
 } as const
 
 export const paletteTokens = ['navy', 'surface', 'white', 'accent', 'navyMuted'] as const
+
+export const fontFamilyTokens = [
+  'poppins',
+  'inter',
+  'open-sans',
+  'roboto',
+  'montserrat',
+  'playfair-display',
+  'lora',
+] as const satisfies readonly FontFamilyToken[]
+
+export const fontFamilyLabels: Record<FontFamilyToken, string> = {
+  poppins: 'Poppins',
+  inter: 'Inter',
+  'open-sans': 'Open Sans',
+  roboto: 'Roboto',
+  montserrat: 'Montserrat',
+  'playfair-display': 'Playfair Display',
+  lora: 'Lora',
+}
 
 const bgClass: Record<PaletteToken, string> = {
   navy: 'bg-[#1A3066]',
@@ -64,6 +86,12 @@ const weightClass: Record<WeightToken, string> = {
 
 const fontClass: Record<FontFamilyToken, string> = {
   poppins: 'font-[family-name:var(--font-poppins)]',
+  inter: 'font-[family-name:var(--font-inter)]',
+  'open-sans': 'font-[family-name:var(--font-open-sans)]',
+  roboto: 'font-[family-name:var(--font-roboto)]',
+  montserrat: 'font-[family-name:var(--font-montserrat)]',
+  'playfair-display': 'font-[family-name:var(--font-playfair-display)]',
+  lora: 'font-[family-name:var(--font-lora)]',
 }
 
 const animationClass: Record<AnimationToken, string> = {
@@ -87,30 +115,68 @@ export function applyBlockStyle(style: BlockStyle): string {
   return [sectionTheme(style), sectionSpacing(style)].join(' ')
 }
 
-export function headingClass(style: BlockStyle): string {
-  return [
-    sizeClass[style.font.size],
-    weightClass[style.font.weight],
-    fontClass[style.font.family],
-    'tracking-tight text-balance',
-  ].join(' ')
+export const weightLabels: Record<WeightToken, string> = {
+  normal: 'Normal (400)',
+  medium: 'Medium (500)',
+  bold: 'Gras (700)',
 }
 
+const lineHeightByRole: Record<TypographyRole, number> = {
+  h1: 1.08,
+  h2: 1.15,
+  h3: 1.2,
+  eyebrow: 1.4,
+  body: 1.6,
+  caption: 1.45,
+  stat: 1.1,
+}
+
+const roleExtras: Record<TypographyRole, string> = {
+  h1: 'tracking-tight text-balance',
+  h2: 'tracking-tight text-balance',
+  h3: 'tracking-tight',
+  eyebrow: 'uppercase tracking-[0.2em]',
+  body: '',
+  caption: '',
+  stat: 'tracking-tight',
+}
+
+export function typographyPresentation(
+  roleStyle: TypographyRoleStyle,
+  role: TypographyRole,
+): { className: string; style: { fontSize: string; lineHeight: number } } {
+  return {
+    className: [fontClass[roleStyle.family], weightClass[roleStyle.weight], roleExtras[role]].filter(Boolean).join(' '),
+    style: {
+      fontSize: `${roleStyle.sizePx}px`,
+      lineHeight: lineHeightByRole[role],
+    },
+  }
+}
+
+/** @deprecated use typographyPresentation */
+export function typographyClass(roleStyle: TypographyRoleStyle, role: TypographyRole): string {
+  const { className } = typographyPresentation(roleStyle, role)
+  return className
+}
+
+/** @deprecated */
+export function headingClass(style: BlockStyle): string {
+  return typographyClass({ sizePx: 52, weight: style.font.weight, family: style.font.family }, 'h1')
+}
+
+/** @deprecated */
 export function sectionTitleClass(style: BlockStyle): string {
-  return [
-    'text-2xl sm:text-3xl lg:text-4xl',
-    weightClass.bold,
-    fontClass[style.font.family],
-    'leading-tight tracking-tight text-balance',
-  ].join(' ')
+  return typographyClass({ sizePx: 36, weight: 'bold', family: style.font.family }, 'h2')
 }
 
 export function sectionLabelClass(): string {
   return 'text-xs font-semibold uppercase tracking-[0.2em] text-[#E63946]'
 }
 
+/** @deprecated */
 export function bodyClass(style: BlockStyle): string {
-  return ['text-base sm:text-lg leading-relaxed', weightClass.normal, fontClass[style.font.family]].join(' ')
+  return typographyClass({ sizePx: 18, weight: 'normal', family: style.font.family }, 'body')
 }
 
 export function mutedClass(): string {
@@ -207,6 +273,8 @@ export function highlightClass(): string {
   return 'text-[#E63946]'
 }
 
-export function eyebrowClass(): string {
-  return 'text-xs font-semibold uppercase tracking-[0.2em] text-[#5C6B8A] sm:text-sm'
+/** @deprecated */
+export function eyebrowClass(style?: BlockStyle): string {
+  const family = style?.font.family ?? 'poppins'
+  return [typographyClass({ sizePx: 12, weight: 'medium', family }, 'eyebrow'), mutedClass()].join(' ')
 }

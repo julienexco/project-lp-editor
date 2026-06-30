@@ -18,6 +18,7 @@ export const defaultBlockStyle: BlockStyle = {
   align: 'left',
   color: { bg: 'surface', text: 'navy' },
   font: { family: 'poppins', size: 'md', weight: 'normal' },
+  typography: {},
   spacing: { marginY: 'normal', paddingX: 'normal' },
   animation: 'none',
 }

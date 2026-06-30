@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 
 type EditableTextProps = {
   value: string
@@ -8,6 +8,7 @@ type EditableTextProps = {
   editable?: boolean
   onEdit?: (field: string, value: string) => void
   className?: string
+  style?: CSSProperties
   as?: 'p' | 'h1' | 'h2' | 'h3' | 'span'
   multiline?: boolean
 }
@@ -18,6 +19,7 @@ export function EditableText({
   editable,
   onEdit,
   className = '',
+  style,
   as: Tag = 'span',
   multiline = false,
 }: EditableTextProps) {
@@ -52,7 +54,11 @@ export function EditableText({
   }
 
   if (!editable || !onEdit) {
-    return <Tag className={className}>{value}</Tag>
+    return (
+      <Tag className={className} style={style}>
+        {value}
+      </Tag>
+    )
   }
 
   if (editing) {
@@ -68,6 +74,7 @@ export function EditableText({
           value={draft}
           rows={3}
           className={sharedClass}
+          style={style}
           onChange={(e) => setDraft(e.target.value)}
           onBlur={commit}
           onClick={stopBubble}
@@ -93,6 +100,7 @@ export function EditableText({
         type="text"
         value={draft}
         className={sharedClass}
+        style={style}
         onChange={(e) => setDraft(e.target.value)}
         onBlur={commit}
         onClick={stopBubble}
@@ -118,6 +126,7 @@ export function EditableText({
         className,
         'cursor-text rounded-sm transition hover:outline hover:outline-1 hover:outline-[#E63946]/40',
       ].join(' ')}
+      style={style}
       title="Double-cliquer pour modifier"
       onDoubleClick={(e) => {
         stopBubble(e)

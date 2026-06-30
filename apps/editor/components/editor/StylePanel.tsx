@@ -1,11 +1,10 @@
-import type { AlignToken, BlockStyle, PaletteToken, SizeToken, SpacingToken } from '@lp-studio/types'
+import type { AlignToken, BlockStyle, PaletteToken, SpacingToken } from '@lp-studio/types'
 
 type StylePanelProps = {
   style: BlockStyle
   palette: readonly PaletteToken[]
   onAlign: (align: AlignToken) => void
   onColor: (key: 'bg' | 'text', token: PaletteToken) => void
-  onFontSize: (size: SizeToken) => void
   onMarginY: (marginY: SpacingToken) => void
 }
 
@@ -17,7 +16,7 @@ const colorSwatch: Record<PaletteToken, string> = {
   navyMuted: '#5C6B8A',
 }
 
-export function StylePanel({ style, palette, onAlign, onColor, onFontSize, onMarginY }: StylePanelProps) {
+export function StylePanel({ style, palette, onAlign, onColor, onMarginY }: StylePanelProps) {
   return (
     <div className="mt-6 space-y-4 border-t border-gray-200 pt-4">
       <p className="text-xs font-semibold uppercase tracking-wide text-[#5C6B8A]">Style</p>
@@ -75,20 +74,6 @@ export function StylePanel({ style, palette, onAlign, onColor, onFontSize, onMar
           ))}
         </div>
       </div>
-
-      <label className="block text-sm">
-        <span className="mb-1 block font-medium text-[#1A3066]">Taille</span>
-        <select
-          className="w-full rounded border px-2 py-1"
-          value={style.font.size}
-          onChange={(e) => onFontSize(e.target.value as SizeToken)}
-        >
-          <option value="sm">sm</option>
-          <option value="md">md</option>
-          <option value="lg">lg</option>
-          <option value="xl">xl</option>
-        </select>
-      </label>
 
       <label className="block text-sm">
         <span className="mb-1 block font-medium text-[#1A3066]">Espacement vertical</span>

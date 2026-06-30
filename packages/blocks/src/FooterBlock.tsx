@@ -1,10 +1,21 @@
 import type { BlockProps } from '@lp-studio/types'
+import { resolveTypographyRole } from '@lp-studio/registry'
 import { containerClass, footerLinkClass, sectionSpacing, sectionTheme } from '@lp-studio/tokens'
 import { BrandLogo } from './BrandLogo'
 import { LinkIcon, MailIcon } from './decorations'
 import { EditableText } from './EditableText'
+import { typoProps } from './typo'
 
 export function FooterBlock({ content, style, editable, onEdit }: BlockProps<'footer'>) {
+  const typo = {
+    body: resolveTypographyRole('footer', style, 'body'),
+    caption: resolveTypographyRole('footer', style, 'caption'),
+  }
+  const t = {
+    body: typoProps(typo.body, 'body'),
+    caption: typoProps(typo.caption, 'caption', 'max-w-md opacity-75'),
+  }
+
   return (
     <footer className={[sectionTheme(style), sectionSpacing(style), 'relative border-t border-white/10'].join(' ')}>
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#E63946] via-[#E63946]/50 to-transparent" />
@@ -19,7 +30,8 @@ export function FooterBlock({ content, style, editable, onEdit }: BlockProps<'fo
                 field="brandName"
                 editable={editable}
                 onEdit={onEdit}
-                className="text-lg font-bold"
+                className={t.body.className}
+                style={t.body.style}
                 as="p"
               />
             )}
@@ -28,7 +40,8 @@ export function FooterBlock({ content, style, editable, onEdit }: BlockProps<'fo
               field="copyright"
               editable={editable}
               onEdit={onEdit}
-              className="max-w-md text-sm leading-relaxed opacity-75"
+              className={t.caption.className}
+              style={t.caption.style}
               as="p"
             />
           </div>
@@ -42,6 +55,8 @@ export function FooterBlock({ content, style, editable, onEdit }: BlockProps<'fo
                   field="email"
                   editable={editable}
                   onEdit={onEdit}
+                  className={t.body.className}
+                  style={t.body.style}
                   as="span"
                 />
               </span>
@@ -59,6 +74,8 @@ export function FooterBlock({ content, style, editable, onEdit }: BlockProps<'fo
                   field="linkedinLabel"
                   editable={editable}
                   onEdit={onEdit}
+                  className={t.body.className}
+                  style={t.body.style}
                   as="span"
                 />
               </span>

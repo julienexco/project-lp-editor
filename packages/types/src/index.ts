@@ -1,17 +1,35 @@
 export type BlockType = 'hero' | 'featureGrid' | 'cta' | 'footer'
 
 export type PaletteToken = 'navy' | 'surface' | 'white' | 'accent' | 'navyMuted'
-export type FontFamilyToken = 'poppins'
+export type FontFamilyToken =
+  | 'poppins'
+  | 'inter'
+  | 'open-sans'
+  | 'roboto'
+  | 'montserrat'
+  | 'playfair-display'
+  | 'lora'
 export type SizeToken = 'sm' | 'md' | 'lg' | 'xl'
 export type WeightToken = 'normal' | 'medium' | 'bold'
 export type SpacingToken = 'tight' | 'normal' | 'loose' | 'xl'
 export type AlignToken = 'left' | 'center' | 'right'
 export type AnimationToken = 'none' | 'fade-in' | 'slide-up'
 
+export type TypographyRole = 'h1' | 'h2' | 'h3' | 'eyebrow' | 'body' | 'caption' | 'stat'
+
+export type TypographyRoleStyle = {
+  sizePx: number
+  weight: WeightToken
+  family: FontFamilyToken
+}
+
+export type TypographyTheme = Partial<Record<TypographyRole, TypographyRoleStyle>>
+
 export type BlockStyle = {
   align: AlignToken
   color: { bg: PaletteToken; text: PaletteToken }
   font: { family: FontFamilyToken; size: SizeToken; weight: WeightToken }
+  typography: TypographyTheme
   spacing: { marginY: SpacingToken; paddingX: SpacingToken }
   animation: AnimationToken
 }

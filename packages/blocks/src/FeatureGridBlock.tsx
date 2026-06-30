@@ -1,19 +1,32 @@
 import type { BlockProps } from '@lp-studio/types'
+import { resolveTypographyRole } from '@lp-studio/registry'
 import {
   containerClass,
   featuredServiceCardClass,
   mutedClass,
   sectionSpacing,
   sectionTheme,
-  sectionTitleClass,
   serviceCardClass,
 } from '@lp-studio/tokens'
 import { AccentBar } from './decorations'
 import { EditableText } from './EditableText'
+import { typoProps } from './typo'
 
 export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProps<'featureGrid'>) {
   const centered = style.align === 'center'
   const featuredIndex = Math.min(1, content.items.length - 1)
+  const typo = {
+    h2: resolveTypographyRole('featureGrid', style, 'h2'),
+    h3: resolveTypographyRole('featureGrid', style, 'h3'),
+    eyebrow: resolveTypographyRole('featureGrid', style, 'eyebrow'),
+    body: resolveTypographyRole('featureGrid', style, 'body'),
+  }
+  const t = {
+    h2: typoProps(typo.h2, 'h2', 'text-[#1A3066]'),
+    h3: typoProps(typo.h3, 'h3', 'text-[#1A3066]'),
+    eyebrow: typoProps(typo.eyebrow, 'eyebrow', mutedClass()),
+    body: typoProps(typo.body, 'body', mutedClass()),
+  }
 
   return (
     <section className={[sectionTheme(style), sectionSpacing(style), 'relative'].join(' ')}>
@@ -31,7 +44,8 @@ export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProp
             field="sectionTitle"
             editable={editable}
             onEdit={onEdit}
-            className={sectionTitleClass(style)}
+            className={t.h2.className}
+            style={t.h2.style}
             as="h2"
           />
         </div>
@@ -57,7 +71,8 @@ export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProp
                 field={`items.${index}.title`}
                 editable={editable}
                 onEdit={onEdit}
-                className="mt-5 text-lg font-bold text-[#1A3066] sm:text-xl"
+                className={`mt-5 ${t.h3.className}`}
+                style={t.h3.style}
                 as="h3"
               />
               <EditableText
@@ -65,7 +80,8 @@ export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProp
                 field={`items.${index}.tagline`}
                 editable={editable}
                 onEdit={onEdit}
-                className={`mt-2 text-xs font-semibold uppercase tracking-wider ${mutedClass()}`}
+                className={`mt-2 ${t.eyebrow.className}`}
+                style={t.eyebrow.style}
                 as="p"
               />
               <EditableText
@@ -74,7 +90,8 @@ export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProp
                 editable={editable}
                 onEdit={onEdit}
                 multiline
-                className={`mt-4 flex-1 text-sm leading-relaxed sm:text-base ${mutedClass()}`}
+                className={`mt-4 flex-1 ${t.body.className}`}
+                style={t.body.style}
                 as="p"
               />
             </article>

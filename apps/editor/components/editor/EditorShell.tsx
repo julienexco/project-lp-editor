@@ -2,12 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BlockRenderer, applyContentField } from '@lp-studio/blocks'
-import { blockRegistry } from '@lp-studio/registry'
-import type { BlockInstance, BlockStyle, BlockType, PageRecord, PaletteToken } from '@lp-studio/types'
+import { blockRegistry, normalizePageBlocks, resolveTypographyRole } from '@lp-studio/registry'
+import type { BlockInstance, BlockStyle, BlockType, PageRecord, PaletteToken, TypographyRole, TypographyRoleStyle } from '@lp-studio/types'
 import { paletteTokens } from '@lp-studio/tokens'
 import { BlockList } from './BlockList'
 import { ContentFields } from './ContentFields'
 import { StylePanel } from './StylePanel'
+import { TypographyPanel } from './TypographyPanel'
 
 const PANEL_STORAGE_KEY = 'lp-studio-panel-open'
 
@@ -17,7 +18,10 @@ type EditorShellProps = {
 }
 
 export function EditorShell({ pageId, initialPage }: EditorShellProps) {
-  const [page, setPage] = useState(initialPage)
+  const [page, setPage] = useState(() => ({
+    ...initialPage,
+    blocks: normalizePageBlocks(initialPage.blocks),
+  }))
   const [selectedId, setSelectedId] = useState<string | null>(initialPage.blocks[0]?.id ?? null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -56,7 +60,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
           })
           if (!res.ok) throw new Error('Échec de la sauvegarde')
           const updated = (await res.json()) as PageRecord
-          setPage(updated)
+          setPage({ ...updated, blocks: normalizePageBlocks(updated.blocks) })
         } catch {
           setError('Impossible de sauvegarder')
         } finally {
@@ -103,6 +107,17 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
     },
     [updateBlocks],
   )
+
+  const updateTypography = (role: TypographyRole, partial: Partial<TypographyRoleStyle>) => {
+    if (!selectedBlock) return
+    const current = resolveTypographyRole(selectedBlock.type as BlockType, selectedBlock.style, role)
+    updateStyle({
+      typography: {
+        ...selectedBlock.style.typography,
+        [role]: { ...current, ...partial },
+      },
+    })
+  }
 
   const updateStyle = (partial: Partial<BlockStyle>) => {
     if (!selectedBlock) return
@@ -178,8 +193,12 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
                   palette={paletteTokens}
                   onAlign={(align) => updateStyle({ align })}
                   onColor={updateColor}
-                  onFontSize={(size) => updateStyle({ font: { ...selectedBlock.style.font, size } })}
                   onMarginY={(marginY) => updateStyle({ spacing: { ...selectedBlock.style.spacing, marginY } })}
+                />
+                <TypographyPanel
+                  blockType={selectedBlock.type as BlockType}
+                  style={selectedBlock.style}
+                  onRoleChange={updateTypography}
                 />
               </div>
             ) : (
