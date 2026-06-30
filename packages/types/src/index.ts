@@ -83,7 +83,11 @@ export type PageRecord = {
   schema_version: string
 }
 
+export type ContentEditHandler = (field: string, value: string) => void
+
 export type BlockProps<T extends BlockType> = {
   content: BlockContentMap[T]
   style: BlockStyle
+  editable?: boolean
+  onEdit?: ContentEditHandler
 }

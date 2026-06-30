@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { BlockRenderer } from '@lp-studio/blocks'
+import { BlockRenderer, applyContentField } from '@lp-studio/blocks'
 import { blockRegistry } from '@lp-studio/registry'
 import type { BlockInstance, BlockStyle, BlockType, PageRecord, PaletteToken } from '@lp-studio/types'
 import { paletteTokens } from '@lp-studio/tokens'
@@ -86,6 +86,23 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
       ),
     )
   }
+
+  const updateBlockContent = useCallback(
+    (blockId: string, field: string, value: string) => {
+      setSelectedId(blockId)
+      updateBlocks((blocks) =>
+        blocks.map((b) =>
+          b.id === blockId
+            ? {
+                ...b,
+                content: applyContentField(b.content as Record<string, unknown>, field, value) as typeof b.content,
+              }
+            : b,
+        ),
+      )
+    },
+    [updateBlocks],
+  )
 
   const updateStyle = (partial: Partial<BlockStyle>) => {
     if (!selectedBlock) return
@@ -187,7 +204,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
         <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#eef2f6]">
           <div className="flex items-center justify-between gap-3 border-b border-[#1A3066]/10 bg-white px-4 py-2">
             <p className="text-xs text-[#5C6B8A]">
-              Aperçu responsive — redimensionnez la fenêtre pour tester mobile / tablette
+              Aperçu responsive — double-cliquez un texte pour l&apos;éditer · redimensionnez pour mobile / tablette
             </p>
             {!panelOpen && selectedBlock ? (
               <p className="truncate text-xs font-medium text-[#1A3066]">
@@ -196,7 +213,12 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
             ) : null}
           </div>
           <div className="flex-1 overflow-y-auto">
-            <BlockRenderer blocks={page.blocks} selectedId={selectedId} onSelect={setSelectedId} />
+            <BlockRenderer
+              blocks={page.blocks}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+              onContentEdit={updateBlockContent}
+            />
           </div>
         </main>
       </div>

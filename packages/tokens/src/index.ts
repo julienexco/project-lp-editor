@@ -53,7 +53,7 @@ const sizeClass: Record<SizeToken, string> = {
   sm: 'text-sm sm:text-base',
   md: 'text-base sm:text-lg',
   lg: 'text-2xl sm:text-3xl lg:text-4xl',
-  xl: 'text-[2rem] leading-[1.08] sm:text-5xl lg:text-[3.25rem]',
+  xl: 'text-[2rem] leading-[1.08] sm:text-[2.75rem] lg:text-[3.5rem]',
 }
 
 const weightClass: Record<WeightToken, string> = {
@@ -117,21 +117,38 @@ export function mutedClass(): string {
   return 'text-[#5C6B8A]'
 }
 
-export function accentButtonClass(): string {
-  return [
-    'items-center justify-center rounded-full bg-[#E63946] px-7 py-3.5 sm:px-8 sm:py-4',
-    'text-sm sm:text-base font-semibold text-white shadow-lg shadow-[#E63946]/25',
-    'transition hover:translate-y-[-1px] hover:shadow-xl hover:brightness-105',
+export function accentButtonClass(variant: 'default' | 'onDark' = 'default'): string {
+  const base = [
+    'inline-flex min-h-11 items-center justify-center rounded-full px-7 py-3.5 sm:min-h-12 sm:px-8 sm:py-4',
+    'text-sm sm:text-base font-semibold shadow-lg transition duration-200',
+    'hover:translate-y-[-1px] hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
     'cursor-pointer',
+  ]
+
+  if (variant === 'onDark') {
+    return [
+      ...base,
+      'bg-[#E63946] text-white shadow-[#E63946]/30 hover:brightness-105 focus-visible:outline-white',
+    ].join(' ')
+  }
+
+  return [
+    ...base,
+    'bg-[#E63946] text-white shadow-[#E63946]/25 hover:brightness-105 focus-visible:outline-[#1A3066]',
   ].join(' ')
 }
 
 export function ghostButtonClass(): string {
   return [
-    'hidden rounded-full border border-[#1A3066]/15 px-5 py-2.5 text-sm font-semibold text-[#1A3066]',
-    'transition hover:border-[#1A3066]/30 hover:bg-[#E3F2FD] sm:inline-flex',
-    'cursor-pointer',
+    'hidden min-h-11 items-center justify-center rounded-full border border-[#1A3066]/15 px-5 py-2.5',
+    'text-sm font-semibold text-[#1A3066] transition duration-200',
+    'hover:border-[#1A3066]/30 hover:bg-[#E3F2FD] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A3066]',
+    'sm:inline-flex cursor-pointer',
   ].join(' ')
+}
+
+export function navBarClass(): string {
+  return 'sticky top-0 z-30 border-b border-[#1A3066]/10 bg-white/90 shadow-sm shadow-[#1A3066]/5 backdrop-blur-md'
 }
 
 export function containerClass(): string {
@@ -148,13 +165,41 @@ export function contentAlignClass(align: AlignToken): string {
 }
 
 export function statCardClass(): string {
-  return 'rounded-2xl border border-[#1A3066]/10 bg-white p-4 shadow-sm sm:p-5'
+  return [
+    'rounded-2xl border border-[#1A3066]/10 bg-white p-4 shadow-sm sm:p-5',
+    'transition duration-200 hover:border-[#1A3066]/15 hover:shadow-md',
+  ].join(' ')
 }
 
 export function serviceCardClass(): string {
   return [
     'flex h-full flex-col rounded-2xl border border-[#1A3066]/10 bg-white p-6 sm:p-7',
-    'shadow-sm transition hover:-translate-y-0.5 hover:border-[#1A3066]/15 hover:shadow-md',
+    'shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-[#1A3066]/15 hover:shadow-md',
+  ].join(' ')
+}
+
+export function featuredServiceCardClass(): string {
+  return [
+    'relative flex h-full flex-col overflow-hidden rounded-2xl border border-[#E63946]/25 bg-white p-6 sm:p-7',
+    'shadow-lg shadow-[#1A3066]/10 ring-1 ring-[#E63946]/10',
+    'transition duration-200 hover:-translate-y-1 hover:shadow-xl',
+  ].join(' ')
+}
+
+export function ctaPanelClass(onNavy: boolean): string {
+  return [
+    'rounded-2xl border px-6 py-10 sm:rounded-3xl sm:px-10 sm:py-14 lg:px-16',
+    onNavy
+      ? 'border-white/10 bg-white/[0.04] backdrop-blur-sm'
+      : 'border-[#1A3066]/10 bg-white shadow-xl shadow-[#1A3066]/10',
+  ].join(' ')
+}
+
+export function footerLinkClass(): string {
+  return [
+    'inline-flex min-h-11 items-center gap-2.5 text-sm font-medium opacity-90 transition duration-200',
+    'hover:text-[#E63946] hover:opacity-100 sm:text-base sm:justify-end',
+    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white',
   ].join(' ')
 }
 
