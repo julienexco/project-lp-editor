@@ -14,7 +14,7 @@ export function BlockRenderer({ blocks, selectedId, onSelect }: BlockRendererPro
   const sorted = [...blocks].sort((a, b) => a.order - b.order)
 
   return (
-    <div className="min-h-full w-full bg-white">
+    <div className="min-h-full w-full bg-white text-[#1A3066]">
       {sorted.map((block) => {
         const isSelected = selectedId === block.id
         const wrapperClass = [

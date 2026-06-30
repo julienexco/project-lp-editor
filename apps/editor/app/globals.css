@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+@source "../../../packages/blocks/src";
+@source "../../../packages/tokens/src";
+@source "../components";
+
 :root {
   --font-poppins: "Poppins", ui-sans-serif, system-ui, sans-serif;
   --color-navy: #1a3066;
@@ -25,7 +29,13 @@ body {
   box-sizing: border-box;
 }
 
+/* Ne pas forcer height:auto — ça casse les logos dimensionnés */
 img {
   max-width: 100%;
-  height: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

@@ -53,7 +53,7 @@ const sizeClass: Record<SizeToken, string> = {
   sm: 'text-sm sm:text-base',
   md: 'text-base sm:text-lg',
   lg: 'text-2xl sm:text-3xl lg:text-4xl',
-  xl: 'text-3xl sm:text-4xl md:text-5xl lg:text-6xl',
+  xl: 'text-[2rem] leading-[1.08] sm:text-5xl lg:text-[3.25rem]',
 }
 
 const weightClass: Record<WeightToken, string> = {
@@ -72,26 +72,12 @@ const animationClass: Record<AnimationToken, string> = {
   'slide-up': 'animate-in fade-in slide-in-from-bottom-4 duration-700',
 }
 
-const alignItemsClass: Record<AlignToken, string> = {
-  left: 'items-start text-left',
-  center: 'items-center text-center',
-  right: 'items-end text-right',
-}
-
-const alignSelfClass: Record<AlignToken, string> = {
-  left: 'mr-auto',
-  center: 'mx-auto',
-  right: 'ml-auto',
-}
-
-/** Fond + couleur texte + animation (niveau section) */
 export function sectionTheme(style: BlockStyle): string {
   return [bgClass[style.color.bg], textClass[style.color.text], animationClass[style.animation], fontClass[style.font.family]]
     .filter(Boolean)
     .join(' ')
 }
 
-/** Espacement responsive section */
 export function sectionSpacing(style: BlockStyle): string {
   return [marginYClass[style.spacing.marginY], paddingXClass[style.spacing.paddingX]].join(' ')
 }
@@ -106,7 +92,7 @@ export function headingClass(style: BlockStyle): string {
     sizeClass[style.font.size],
     weightClass[style.font.weight],
     fontClass[style.font.family],
-    'leading-[1.1] tracking-tight',
+    'tracking-tight text-balance',
   ].join(' ')
 }
 
@@ -115,8 +101,12 @@ export function sectionTitleClass(style: BlockStyle): string {
     'text-2xl sm:text-3xl lg:text-4xl',
     weightClass.bold,
     fontClass[style.font.family],
-    'leading-tight tracking-tight',
+    'leading-tight tracking-tight text-balance',
   ].join(' ')
+}
+
+export function sectionLabelClass(): string {
+  return 'text-xs font-semibold uppercase tracking-[0.2em] text-[#E63946]'
 }
 
 export function bodyClass(style: BlockStyle): string {
@@ -127,14 +117,20 @@ export function mutedClass(): string {
   return 'text-[#5C6B8A]'
 }
 
-export function accentButtonClass(align: AlignToken = 'left'): string {
-  const alignBtn =
-    align === 'center' ? 'mx-auto' : align === 'right' ? 'ml-auto' : ''
+export function accentButtonClass(): string {
   return [
-    'inline-flex items-center justify-center rounded-full bg-[#E63946] px-7 py-3.5 sm:px-8 sm:py-4',
+    'items-center justify-center rounded-full bg-[#E63946] px-7 py-3.5 sm:px-8 sm:py-4',
     'text-sm sm:text-base font-semibold text-white shadow-lg shadow-[#E63946]/25',
     'transition hover:translate-y-[-1px] hover:shadow-xl hover:brightness-105',
-    alignBtn,
+    'cursor-pointer',
+  ].join(' ')
+}
+
+export function ghostButtonClass(): string {
+  return [
+    'hidden rounded-full border border-[#1A3066]/15 px-5 py-2.5 text-sm font-semibold text-[#1A3066]',
+    'transition hover:border-[#1A3066]/30 hover:bg-[#E3F2FD] sm:inline-flex',
+    'cursor-pointer',
   ].join(' ')
 }
 
@@ -143,21 +139,22 @@ export function containerClass(): string {
 }
 
 export function contentAlignClass(align: AlignToken): string {
-  return ['flex flex-col gap-6 sm:gap-8', alignItemsClass[align]].join(' ')
-}
-
-export function contentWidthClass(align: AlignToken): string {
-  return ['w-full max-w-3xl', alignSelfClass[align]].join(' ')
+  const map = {
+    left: 'items-start text-left',
+    center: 'items-center text-center',
+    right: 'items-end text-right',
+  }
+  return ['flex flex-col gap-6 sm:gap-8', map[align]].join(' ')
 }
 
 export function statCardClass(): string {
-  return 'rounded-2xl border border-[#1A3066]/10 bg-white/80 p-4 sm:p-5 shadow-sm backdrop-blur-sm'
+  return 'rounded-2xl border border-[#1A3066]/10 bg-white p-4 shadow-sm sm:p-5'
 }
 
 export function serviceCardClass(): string {
   return [
-    'flex h-full flex-col rounded-2xl border border-[#1A3066]/10 bg-white p-6 sm:p-8',
-    'shadow-sm transition hover:-translate-y-0.5 hover:border-[#1A3066]/20 hover:shadow-md',
+    'flex h-full flex-col rounded-2xl border border-[#1A3066]/10 bg-white p-6 sm:p-7',
+    'shadow-sm transition hover:-translate-y-0.5 hover:border-[#1A3066]/15 hover:shadow-md',
   ].join(' ')
 }
 
@@ -166,5 +163,5 @@ export function highlightClass(): string {
 }
 
 export function eyebrowClass(): string {
-  return 'text-xs font-medium uppercase tracking-[0.2em] text-[#5C6B8A] sm:text-sm'
+  return 'text-xs font-semibold uppercase tracking-[0.2em] text-[#5C6B8A] sm:text-sm'
 }
