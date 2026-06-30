@@ -1,7 +1,8 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
 import { join } from 'path'
-import type { BlockInstance, PageRecord } from '@lp-studio/types'
+import type { BlockInstance, PageMeta, PageRecord } from '@lp-studio/types'
 import { normalizePageBlocks } from '@lp-studio/registry'
+import { mergePageCustomColors } from '@lp-studio/tokens'
 import { createClient } from '@supabase/supabase-js'
 
 const DEFAULT_PAGE_ID = '00000000-0000-4000-8000-000000000001'
@@ -14,14 +15,7 @@ function loadSeed(): PageRecord {
   const seedPath = join(process.cwd(), '../../supabase/seed/upscaly-consulting.json')
   const raw = readFileSync(seedPath, 'utf-8')
   const parsed = JSON.parse(raw) as PageRecord
-  return {
-    ...parsed,
-    blocks: normalizePageBlocks(parsed.blocks),
-    config: parsed.config ?? {},
-    meta: parsed.meta ?? {},
-    schema_version: parsed.schema_version ?? '1.0.0',
-    status: parsed.status ?? 'draft',
-  }
+  return withDefaults(parsed)
 }
 
 function readLocalPage(id: string): PageRecord {
@@ -35,13 +29,7 @@ function readLocalPage(id: string): PageRecord {
   }
   const page = JSON.parse(readFileSync(storePath, 'utf-8')) as PageRecord
   if (page.id !== id) return { ...loadSeed(), id }
-  return {
-    ...page,
-    blocks: normalizePageBlocks(page.blocks),
-    config: page.config ?? {},
-    meta: page.meta ?? {},
-    schema_version: page.schema_version ?? '1.0.0',
-  }
+  return withDefaults(page)
 }
 
 function writeLocalPage(page: PageRecord) {
@@ -65,11 +53,14 @@ function getSupabaseAdmin() {
 }
 
 function withDefaults(page: PageRecord): PageRecord {
+  const blocks = normalizePageBlocks(page.blocks)
+  const meta: PageMeta = { ...(page.meta ?? {}) }
+  meta.customColors = mergePageCustomColors(meta, blocks)
   return {
     ...page,
-    blocks: normalizePageBlocks(page.blocks),
+    blocks,
     config: page.config ?? {},
-    meta: page.meta ?? {},
+    meta,
     schema_version: page.schema_version ?? '1.0.0',
   }
 }
@@ -83,15 +74,30 @@ export async function getPage(id: string): Promise<PageRecord | null> {
   return readLocalPage(id)
 }
 
-export async function updatePageBlocks(id: string, blocks: BlockInstance[]): Promise<PageRecord> {
-  const normalizedBlocks = normalizePageBlocks(blocks)
+export type PagePatch = {
+  blocks?: BlockInstance[]
+  meta?: PageMeta
+}
+
+export async function updatePage(id: string, patch: PagePatch): Promise<PageRecord> {
+  const current = await getPage(id)
+  if (!current) throw new Error('Page not found')
+
+  const normalizedBlocks = patch.blocks ? normalizePageBlocks(patch.blocks) : current.blocks
+  const meta: PageMeta = { ...current.meta, ...patch.meta }
+  if (patch.meta?.customColors) {
+    meta.customColors = mergePageCustomColors(meta, normalizedBlocks)
+  } else {
+    meta.customColors = mergePageCustomColors(meta, normalizedBlocks)
+  }
+
   const updatedAt = new Date().toISOString()
   const supabase = getSupabaseAdmin()
 
   if (supabase) {
     const { data, error } = await supabase
       .from('pages')
-      .update({ blocks: normalizedBlocks, updated_at: updatedAt })
+      .update({ blocks: normalizedBlocks, meta, updated_at: updatedAt })
       .eq('id', id)
       .select('*')
       .single()
@@ -100,14 +106,19 @@ export async function updatePageBlocks(id: string, blocks: BlockInstance[]): Pro
     console.warn('[page-store] Supabase save failed, falling back to local file:', error?.message)
   }
 
-  const page = readLocalPage(id)
   const next: PageRecord = {
-    ...page,
+    ...current,
     blocks: normalizedBlocks,
+    meta,
     updated_at: updatedAt,
   }
   writeLocalPage(next)
   return next
+}
+
+/** @deprecated use updatePage */
+export async function updatePageBlocks(id: string, blocks: BlockInstance[]): Promise<PageRecord> {
+  return updatePage(id, { blocks })
 }
 
 export { DEFAULT_PAGE_ID }

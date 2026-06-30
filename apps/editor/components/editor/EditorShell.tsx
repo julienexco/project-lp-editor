@@ -3,10 +3,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BlockRenderer, applyContentField } from '@lp-studio/blocks'
 import { blockRegistry, normalizePageBlocks, resolveTypographyRole } from '@lp-studio/registry'
-import type { BlockInstance, BlockStyle, BlockType, PageRecord, PaletteToken, TypographyRole, TypographyRoleStyle } from '@lp-studio/types'
-import { paletteTokens } from '@lp-studio/tokens'
+import type { BlockInstance, BlockStyle, BlockType, ColorValue, PageRecord, TypographyRole, TypographyRoleStyle } from '@lp-studio/types'
+import { isPaletteToken, mergePageCustomColors, registerPageCustomColor, removePageCustomColor } from '@lp-studio/tokens'
 import { BlockList } from './BlockList'
 import { ContentFields } from './ContentFields'
+import { EditorSectionTitle } from './EditorSectionTitle'
+import { PREVIEW_VIEWPORTS, PreviewToolbar, detectDeviceViewport, loadSavedPreviewOverride, savePreviewViewport, type PreviewViewport } from './PreviewToolbar'
 import { StylePanel } from './StylePanel'
 import { TypographyPanel } from './TypographyPanel'
 
@@ -23,29 +25,59 @@ function formatSavedAt(iso: string): string {
 }
 
 export function EditorShell({ pageId, initialPage }: EditorShellProps) {
-  const [page, setPage] = useState(() => ({
-    ...initialPage,
-    blocks: normalizePageBlocks(initialPage.blocks),
-  }))
+  const [page, setPage] = useState(() => {
+    const blocks = normalizePageBlocks(initialPage.blocks)
+    const customColors = mergePageCustomColors(initialPage.meta ?? {}, blocks)
+    return {
+      ...initialPage,
+      blocks,
+      meta: { ...initialPage.meta, customColors },
+    }
+  })
   const [selectedId, setSelectedId] = useState<string | null>(initialPage.blocks[0]?.id ?? null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(initialPage.updated_at ?? null)
   const [panelOpen, setPanelOpen] = useState(true)
+  const [previewViewport, setPreviewViewport] = useState<PreviewViewport>('desktop')
+  const [viewportOverride, setViewportOverride] = useState(false)
+  const [isNativeNarrow, setIsNativeNarrow] = useState(false)
 
   const blocksRef = useRef(page.blocks)
+  const metaRef = useRef(page.meta)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const saveInFlightRef = useRef(false)
   const needsResaveRef = useRef(false)
 
   useEffect(() => {
     blocksRef.current = page.blocks
-  }, [page.blocks])
+    metaRef.current = page.meta
+  }, [page.blocks, page.meta])
 
   useEffect(() => {
     const stored = localStorage.getItem(PANEL_STORAGE_KEY)
     if (stored === 'false') setPanelOpen(false)
-  }, [])
+    else if (stored === null && window.matchMedia('(max-width: 767px)').matches) {
+      setPanelOpen(false)
+    }
+
+    const syncViewport = () => {
+      const narrow = window.innerWidth < 1024
+      setIsNativeNarrow(narrow)
+      if (narrow) {
+        setPreviewViewport(detectDeviceViewport())
+        setViewportOverride(false)
+        return
+      }
+      if (!viewportOverride) {
+        setPreviewViewport(loadSavedPreviewOverride() ?? 'desktop')
+      }
+    }
+
+    syncViewport()
+    window.addEventListener('resize', syncViewport)
+    return () => window.removeEventListener('resize', syncViewport)
+  }, [viewportOverride])
 
   const togglePanel = () => {
     setPanelOpen((open) => {
@@ -55,10 +87,21 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
     })
   }
 
+  const handleViewportChange = (viewport: PreviewViewport) => {
+    setPreviewViewport(viewport)
+    setViewportOverride(true)
+    savePreviewViewport(viewport)
+  }
+
   const selectedBlock = useMemo(
     () => page.blocks.find((b) => b.id === selectedId) ?? null,
     [page.blocks, selectedId],
   )
+
+  const effectivePreviewWidth = isNativeNarrow ? '100%' : PREVIEW_VIEWPORTS[previewViewport].width
+  const selectedBlockLabel = selectedBlock
+    ? blockRegistry[selectedBlock.type as BlockType]?.label
+    : null
 
   const runSave = useCallback(async () => {
     if (saveInFlightRef.current) {
@@ -78,7 +121,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
         const res = await fetch(`/api/pages/${pageId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ blocks: blocksToSave }),
+          body: JSON.stringify({ blocks: blocksToSave, meta: metaRef.current }),
         })
 
         if (!res.ok) {
@@ -87,6 +130,15 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
         }
 
         const updated = (await res.json()) as PageRecord
+        setPage((prev) => {
+          const blocks = prev.blocks
+          const customColors = mergePageCustomColors(updated.meta ?? prev.meta, blocks)
+          return {
+            ...prev,
+            meta: { ...(updated.meta ?? prev.meta), customColors },
+            updated_at: updated.updated_at,
+          }
+        })
         setLastSavedAt(updated.updated_at ?? new Date().toISOString())
       } while (needsResaveRef.current)
     } catch (e) {
@@ -170,9 +222,40 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
     )
   }
 
-  const updateColor = (key: 'bg' | 'text', token: PaletteToken) => {
+  const updateColor = (key: 'bg' | 'text', value: ColorValue) => {
     if (!selectedBlock) return
-    updateStyle({ color: { ...selectedBlock.style.color, [key]: token } })
+    setPage((prev) => {
+      const customColors = !isPaletteToken(value)
+        ? registerPageCustomColor(prev.meta.customColors ?? [], value)
+        : (prev.meta.customColors ?? [])
+
+      const nextBlocks = prev.blocks.map((b) =>
+        b.id === selectedBlock.id
+          ? { ...b, style: { ...b.style, color: { ...b.style.color, [key]: value } } }
+          : b,
+      )
+
+      const next = {
+        ...prev,
+        meta: { ...prev.meta, customColors },
+        blocks: nextBlocks,
+      }
+      blocksRef.current = nextBlocks
+      metaRef.current = next.meta
+      return next
+    })
+    scheduleSave()
+  }
+
+  const removeCustomColor = (hex: string) => {
+    setPage((prev) => {
+      const nextMeta = removePageCustomColor(prev.meta, hex)
+      const customColors = mergePageCustomColors(nextMeta, prev.blocks)
+      const meta = { ...nextMeta, customColors }
+      metaRef.current = meta
+      return { ...prev, meta }
+    })
+    scheduleSave()
   }
 
   useEffect(() => {
@@ -184,7 +267,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
       fetch(`/api/pages/${pageId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ blocks }),
+        body: JSON.stringify({ blocks, meta: metaRef.current }),
         keepalive: true,
       }).catch(() => undefined)
     }
@@ -205,21 +288,22 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
         : 'Brouillon · non sauvegardé'
 
   return (
-    <div className="flex h-screen flex-col bg-[#1A3066]">
-      <header className="flex items-center justify-between border-b border-white/10 px-6 py-3 text-white">
-        <div>
+    <div className="flex h-[100dvh] flex-col bg-[#1A3066]">
+      <header className="flex flex-col gap-3 border-b border-white/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+        <div className="min-w-0">
           <p className="text-xs uppercase tracking-widest text-white/60">LP Studio MVP</p>
-          <h1 className="text-lg font-semibold">{page.name}</h1>
+          <h1 className="truncate text-lg font-semibold text-white">{page.name}</h1>
         </div>
-        <div className="flex items-center gap-3 text-sm">
+        <div className="flex flex-wrap items-center gap-2 text-sm sm:gap-3">
           {!saving && !error && lastSavedAt ? (
             <span className="inline-flex items-center gap-1.5 text-emerald-300" aria-live="polite">
               <CheckIcon />
-              {saveStatus}
+              <span className="hidden sm:inline">{saveStatus}</span>
+              <span className="sm:hidden">OK</span>
             </span>
           ) : (
             <span className={error ? 'text-[#E63946]' : 'text-white/80'} aria-live="polite">
-              {saveStatus}
+              {saving ? 'Sauvegarde…' : error ?? saveStatus}
             </span>
           )}
           <button
@@ -233,11 +317,23 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
         </div>
       </header>
 
-      <div className="relative flex flex-1 overflow-hidden">
+      <div className="relative flex min-h-0 flex-1 overflow-hidden">
+        {panelOpen ? (
+          <button
+            type="button"
+            className="fixed inset-0 z-20 bg-[#1A3066]/50 md:hidden"
+            aria-label="Fermer le panneau d'édition"
+            onClick={togglePanel}
+          />
+        ) : null}
+
         <aside
           className={[
-            'flex shrink-0 flex-col overflow-hidden border-r border-white/10 bg-white transition-[width] duration-300 ease-in-out',
-            panelOpen ? 'w-[min(100vw,320px)]' : 'w-0 border-r-0',
+            'z-30 flex flex-col overflow-hidden bg-white',
+            'max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:w-[min(100vw,320px)] max-md:shadow-2xl max-md:transition-transform max-md:duration-300',
+            panelOpen ? 'max-md:translate-x-0' : 'max-md:pointer-events-none max-md:-translate-x-full',
+            'md:shrink-0 md:border-r md:border-white/10 md:transition-[width] md:duration-300 md:ease-in-out',
+            panelOpen ? 'md:w-[min(100vw,320px)]' : 'md:w-0 md:border-r-0',
           ].join(' ')}
           aria-hidden={!panelOpen}
         >
@@ -255,36 +351,52 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
               </button>
             </div>
 
-            <BlockList
-              blocks={page.blocks}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-              registry={blockRegistry}
-            />
+            <section className="border-b border-gray-200">
+              <EditorSectionTitle>Blocs</EditorSectionTitle>
+              <BlockList
+                blocks={page.blocks}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                registry={blockRegistry}
+              />
+            </section>
 
             {selectedBlock ? (
-              <div className="border-t border-gray-200 p-4">
-                <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#5C6B8A]">Contenu</p>
-                <ContentFields
-                  block={selectedBlock}
-                  schema={blockRegistry[selectedBlock.type as BlockType].contentSchema}
-                  onChange={updateContent}
-                />
-                <StylePanel
-                  style={selectedBlock.style}
-                  palette={paletteTokens}
-                  onAlign={(align) => updateStyle({ align })}
-                  onColor={updateColor}
-                  onMarginY={(marginY) => updateStyle({ spacing: { ...selectedBlock.style.spacing, marginY } })}
-                />
-                <TypographyPanel
-                  blockType={selectedBlock.type as BlockType}
-                  style={selectedBlock.style}
-                  onRoleChange={updateTypography}
-                />
-              </div>
+              <>
+                <section className="border-b border-gray-200">
+                  <EditorSectionTitle>Contenu</EditorSectionTitle>
+                  <div className="px-4 py-4">
+                    <ContentFields
+                      block={selectedBlock}
+                      schema={blockRegistry[selectedBlock.type as BlockType].contentSchema}
+                      onChange={updateContent}
+                    />
+                  </div>
+                </section>
+
+                <section className="border-b border-gray-200">
+                  <EditorSectionTitle>Style</EditorSectionTitle>
+                  <StylePanel
+                    style={selectedBlock.style}
+                    customColors={page.meta.customColors ?? []}
+                    onAlign={(align) => updateStyle({ align })}
+                    onColor={updateColor}
+                    onRemoveCustomColor={removeCustomColor}
+                    onMarginY={(marginY) => updateStyle({ spacing: { ...selectedBlock.style.spacing, marginY } })}
+                  />
+                </section>
+
+                <section>
+                  <EditorSectionTitle>Typographie</EditorSectionTitle>
+                  <TypographyPanel
+                    blockType={selectedBlock.type as BlockType}
+                    style={selectedBlock.style}
+                    onRoleChange={updateTypography}
+                  />
+                </section>
+              </>
             ) : (
-              <p className="p-4 text-sm text-gray-500">Sélectionnez un bloc</p>
+              <p className="p-4 text-sm text-gray-500">Sélectionnez un bloc pour éditer son contenu, son style et sa typographie.</p>
             )}
           </div>
         </aside>
@@ -302,24 +414,33 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
           </button>
         ) : null}
 
-        <main className="flex min-w-0 flex-1 flex-col overflow-hidden bg-[#eef2f6]">
-          <div className="flex items-center justify-between gap-3 border-b border-[#1A3066]/10 bg-white px-4 py-2">
-            <p className="text-xs text-[#5C6B8A]">
-              Aperçu responsive — double-cliquez un texte pour l&apos;éditer · sauvegarde auto à chaque modification
-            </p>
-            {!panelOpen && selectedBlock ? (
-              <p className="truncate text-xs font-medium text-[#1A3066]">
-                Bloc : {blockRegistry[selectedBlock.type as BlockType]?.label}
-              </p>
-            ) : null}
-          </div>
-          <div className="flex-1 overflow-y-auto">
-            <BlockRenderer
-              blocks={page.blocks}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-              onContentEdit={updateBlockContent}
-            />
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#eef2f6]">
+          <PreviewToolbar
+            viewport={previewViewport}
+            onViewportChange={handleViewportChange}
+            selectedBlockLabel={selectedBlockLabel}
+            onOpenPanel={togglePanel}
+            panelOpen={panelOpen}
+            hideViewportSwitcher={isNativeNarrow}
+          />
+          <div className={['flex-1 overflow-auto bg-[#dde3ea]', isNativeNarrow ? 'p-0' : 'p-3 sm:p-6'].join(' ')}>
+            <div
+              className={[
+                'mx-auto min-h-full w-full bg-white transition-[width,max-width] duration-300 ease-out',
+                isNativeNarrow ? '' : 'overflow-hidden shadow-xl ring-1 ring-[#1A3066]/10',
+              ].join(' ')}
+              style={{
+                width: effectivePreviewWidth,
+                maxWidth: effectivePreviewWidth === '100%' ? '100%' : effectivePreviewWidth,
+              }}
+            >
+              <BlockRenderer
+                blocks={page.blocks}
+                selectedId={selectedId}
+                onSelect={setSelectedId}
+                onContentEdit={updateBlockContent}
+              />
+            </div>
           </div>
         </main>
       </div>

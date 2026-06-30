@@ -1,6 +1,8 @@
 export type BlockType = 'hero' | 'featureGrid' | 'cta' | 'footer'
 
 export type PaletteToken = 'navy' | 'surface' | 'white' | 'accent' | 'navyMuted'
+/** Preset palette token or custom hex (#RRGGBB) */
+export type ColorValue = PaletteToken | `#${string}`
 export type FontFamilyToken =
   | 'poppins'
   | 'inter'
@@ -27,7 +29,7 @@ export type TypographyTheme = Partial<Record<TypographyRole, TypographyRoleStyle
 
 export type BlockStyle = {
   align: AlignToken
-  color: { bg: PaletteToken; text: PaletteToken }
+  color: { bg: ColorValue; text: ColorValue }
   font: { family: FontFamilyToken; size: SizeToken; weight: WeightToken }
   typography: TypographyTheme
   spacing: { marginY: SpacingToken; paddingX: SpacingToken }
@@ -97,9 +99,17 @@ export type PageRecord = {
   status: 'draft' | 'published'
   blocks: BlockInstance[]
   config: Record<string, unknown>
-  meta: Record<string, unknown>
+  meta: PageMeta
   schema_version: string
   updated_at?: string
+}
+
+/** Couleurs custom partagées sur toute la page (style Google Slides) */
+export type PageMeta = {
+  customColors?: string[]
+  /** Couleurs retirées de la palette (ne pas réinjecter depuis les blocs) */
+  removedCustomColors?: string[]
+  [key: string]: unknown
 }
 
 export type ContentEditHandler = (field: string, value: string) => void

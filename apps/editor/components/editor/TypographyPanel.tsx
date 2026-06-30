@@ -7,7 +7,7 @@ import {
   resolveTypographyRole,
   typographyRoleLabels,
 } from '@lp-studio/registry'
-import { fontFamilyLabels, fontFamilyTokens, weightLabels } from '@lp-studio/tokens'
+import { fontFamilyLabels, fontFamilyTokens, deriveResponsiveFontSizes, weightLabels } from '@lp-studio/tokens'
 
 type TypographyPanelProps = {
   blockType: BlockType
@@ -21,12 +21,10 @@ export function TypographyPanel({ blockType, style, onRoleChange }: TypographyPa
   const roles = blockTypographyRoles[blockType]
 
   return (
-    <div className="mt-6 space-y-4 border-t border-gray-200 pt-4">
-      <p className="text-xs font-semibold uppercase tracking-wide text-[#5C6B8A]">Typographie</p>
-
-      <div className="space-y-3">
+    <div className="space-y-3 px-4 py-4">
         {roles.map((role) => {
           const resolved = resolveTypographyRole(blockType, style, role)
+          const sizes = deriveResponsiveFontSizes(resolved.sizePx)
           return (
             <div key={role} className="rounded-lg border border-gray-100 bg-[#f8fafc] p-3">
               <p className="mb-2 text-sm font-medium text-[#1A3066]">{typographyRoleLabels[role]}</p>
@@ -48,7 +46,7 @@ export function TypographyPanel({ blockType, style, onRoleChange }: TypographyPa
 
               <div className="grid grid-cols-2 gap-2">
                 <label className="block text-xs">
-                  <span className="mb-1 block text-[#5C6B8A]">Taille (px)</span>
+                  <span className="mb-1 block text-[#5C6B8A]">Taille desktop (px)</span>
                   <input
                     type="number"
                     min={10}
@@ -74,10 +72,12 @@ export function TypographyPanel({ blockType, style, onRoleChange }: TypographyPa
                   </select>
                 </label>
               </div>
+              <p className="mt-2 text-[11px] leading-relaxed text-[#5C6B8A]">
+                Tablette {sizes.tablet}px · Mobile {sizes.mobile}px (calculés depuis le desktop)
+              </p>
             </div>
           )
         })}
-      </div>
     </div>
   )
 }

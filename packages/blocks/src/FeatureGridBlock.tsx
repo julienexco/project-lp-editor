@@ -1,12 +1,17 @@
 import type { BlockProps } from '@lp-studio/types'
 import { resolveTypographyRole } from '@lp-studio/registry'
 import {
+  cardPrimaryTextClass,
+  cardSecondaryTextClass,
   containerClass,
   featuredServiceCardClass,
-  mutedClass,
+  primaryTextClass,
+  secondaryTextClass,
   sectionSpacing,
+  sectionColorStyle,
   sectionTheme,
   serviceCardClass,
+  paletteTextClass,
 } from '@lp-studio/tokens'
 import { AccentBar } from './decorations'
 import { EditableText } from './EditableText'
@@ -22,19 +27,19 @@ export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProp
     body: resolveTypographyRole('featureGrid', style, 'body'),
   }
   const t = {
-    h2: typoProps(typo.h2, 'h2', 'text-[#1A3066]'),
-    h3: typoProps(typo.h3, 'h3', 'text-[#1A3066]'),
-    eyebrow: typoProps(typo.eyebrow, 'eyebrow', mutedClass()),
-    body: typoProps(typo.body, 'body', mutedClass()),
+    h2: typoProps(typo.h2, 'h2', primaryTextClass(style)),
+    h3: typoProps(typo.h3, 'h3', cardPrimaryTextClass()),
+    eyebrow: typoProps(typo.eyebrow, 'eyebrow', cardSecondaryTextClass()),
+    body: typoProps(typo.body, 'body', cardSecondaryTextClass()),
   }
 
   return (
-    <section className={[sectionTheme(style), sectionSpacing(style), 'relative'].join(' ')}>
+    <section className={[sectionTheme(style), sectionSpacing(style), 'relative'].join(' ')} style={sectionColorStyle(style)}>
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#1A3066]/10 to-transparent" />
       <div className={containerClass()}>
         <div
           className={[
-            'mb-10 flex flex-col gap-4 sm:mb-14',
+            'mb-10 flex flex-col gap-4 @sm:mb-14',
             centered ? 'mx-auto max-w-2xl items-center text-center' : 'max-w-2xl',
           ].join(' ')}
         >
@@ -50,7 +55,7 @@ export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProp
           />
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+        <div className="grid gap-5 @sm:grid-cols-2 @sm:gap-6 @lg:grid-cols-3">
           {content.items.map((item, index) => (
             <article
               key={`item-${index}`}
@@ -61,7 +66,7 @@ export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProp
                   'inline-flex h-10 w-10 items-center justify-center rounded-xl text-xs font-bold',
                   index === featuredIndex
                     ? 'bg-[#E63946] text-white shadow-md shadow-[#E63946]/25'
-                    : 'bg-[#E3F2FD] text-[#1A3066]',
+                    : `bg-[#E3F2FD] ${paletteTextClass('navy')}`,
                 ].join(' ')}
               >
                 {String(index + 1).padStart(2, '0')}

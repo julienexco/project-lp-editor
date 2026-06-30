@@ -2,6 +2,7 @@ import type {
   AlignToken,
   AnimationToken,
   BlockStyle,
+  ColorValue,
   FontFamilyToken,
   PaletteToken,
   SizeToken,
@@ -11,15 +12,35 @@ import type {
   WeightToken,
 } from '@lp-studio/types'
 
-export const brandColors = {
-  navy: '#1A3066',
-  surface: '#E3F2FD',
-  white: '#FFFFFF',
-  accent: '#E63946',
-  navyMuted: '#5C6B8A',
-} as const
+export {
+  brandColors,
+  paletteTokens,
+  paletteLabels,
+  backgroundPaletteTokens,
+  textPaletteTokens,
+} from './brand'
 
-export const paletteTokens = ['navy', 'surface', 'white', 'accent', 'navyMuted'] as const
+export {
+  colorValueLabel,
+  hexColorsMatch,
+  hexToHsl,
+  hslToHex,
+  isCustomHexColor,
+  isDarkBackgroundValue,
+  isPaletteToken,
+  isWhiteishBackground,
+  MAX_PAGE_CUSTOM_COLORS,
+  normalizeHex,
+  relativeLuminance,
+  registerPageCustomColor,
+  resolveColorHex,
+  sectionColorStyle,
+} from './color'
+
+export { collectCustomColorsFromBlocks, getPageCustomColors, mergePageCustomColors, removePageCustomColor } from './page-palette'
+
+import { brandColors } from './brand'
+import { isDarkBackgroundValue, isPaletteToken, isWhiteishBackground, resolveColorHex } from './color'
 
 export const fontFamilyTokens = [
   'poppins',
@@ -57,18 +78,58 @@ const textClass: Record<PaletteToken, string> = {
   navyMuted: 'text-[#5C6B8A]',
 }
 
+const darkBackgrounds: PaletteToken[] = ['navy', 'navyMuted', 'accent']
+
+export function paletteBgClass(token: PaletteToken): string {
+  return bgClass[token]
+}
+
+export function paletteTextClass(token: PaletteToken): string {
+  return textClass[token]
+}
+
+/** @deprecated use isDarkBackgroundValue */
+export function isDarkBackground(bg: ColorValue): boolean {
+  return isDarkBackgroundValue(bg)
+}
+
+/** Texte principal selon la couleur du bloc */
+export function primaryTextClass(style: BlockStyle): string {
+  if (isPaletteToken(style.color.text)) return textClass[style.color.text]
+  return ''
+}
+
+/** Texte secondaire lisible sur le fond du bloc */
+export function secondaryTextClass(style: BlockStyle): string {
+  if (isDarkBackgroundValue(style.color.bg)) {
+    if (isPaletteToken(style.color.text) && style.color.text === 'surface') return textClass.surface
+    return 'opacity-80'
+  }
+  if (!isPaletteToken(style.color.text)) return 'opacity-70'
+  return textClass.navyMuted
+}
+
+/** Texte sur cartes blanches (toujours fond clair) */
+export function cardPrimaryTextClass(): string {
+  return textClass.navy
+}
+
+export function cardSecondaryTextClass(): string {
+  return textClass.navyMuted
+}
+
 const marginYClass: Record<SpacingToken, string> = {
-  tight: 'py-12 sm:py-14',
-  normal: 'py-16 sm:py-20',
-  loose: 'py-20 sm:py-24 lg:py-28',
-  xl: 'py-24 sm:py-28 lg:py-32',
+  tight: 'py-12 @sm:py-14',
+  normal: 'py-16 @sm:py-20',
+  loose: 'py-20 @sm:py-24 @lg:py-28',
+  xl: 'py-24 @sm:py-28 @lg:py-32',
 }
 
 const paddingXClass: Record<SpacingToken, string> = {
-  tight: 'px-4 sm:px-6',
-  normal: 'px-4 sm:px-6 lg:px-8',
-  loose: 'px-4 sm:px-8 lg:px-12',
-  xl: 'px-4 sm:px-10 lg:px-16',
+  tight: 'px-4 @sm:px-6',
+  normal: 'px-4 @sm:px-6 @lg:px-8',
+  loose: 'px-4 @sm:px-8 @lg:px-12',
+  xl: 'px-4 @sm:px-10 @lg:px-16',
 }
 
 const sizeClass: Record<SizeToken, string> = {
@@ -101,9 +162,7 @@ const animationClass: Record<AnimationToken, string> = {
 }
 
 export function sectionTheme(style: BlockStyle): string {
-  return [bgClass[style.color.bg], textClass[style.color.text], animationClass[style.animation], fontClass[style.font.family]]
-    .filter(Boolean)
-    .join(' ')
+  return [animationClass[style.animation], fontClass[style.font.family]].filter(Boolean).join(' ')
 }
 
 export function sectionSpacing(style: BlockStyle): string {
@@ -119,6 +178,36 @@ export const weightLabels: Record<WeightToken, string> = {
   normal: 'Normal (400)',
   medium: 'Medium (500)',
   bold: 'Gras (700)',
+}
+
+/** Desktop size drives tablet (78%) and mobile (58%) automatically. */
+export const RESPONSIVE_FONT_SCALE = {
+  mobile: 0.58,
+  tablet: 0.78,
+  desktop: 1,
+} as const
+
+const FLUID_MOBILE_WIDTH_PX = 390
+const FLUID_DESKTOP_WIDTH_PX = 1024
+const FLUID_WIDTH_SPAN_PX = FLUID_DESKTOP_WIDTH_PX - FLUID_MOBILE_WIDTH_PX
+
+export function deriveResponsiveFontSizes(desktopPx: number): {
+  desktop: number
+  tablet: number
+  mobile: number
+} {
+  const desktop = Math.min(120, Math.max(10, Math.round(desktopPx)))
+  return {
+    desktop,
+    tablet: Math.max(10, Math.round(desktop * RESPONSIVE_FONT_SCALE.tablet)),
+    mobile: Math.max(10, Math.round(desktop * RESPONSIVE_FONT_SCALE.mobile)),
+  }
+}
+
+/** Fluid font-size from a single desktop px value, scaled by preview container width. */
+export function fluidFontSizeFromDesktop(desktopPx: number): string {
+  const { desktop, mobile } = deriveResponsiveFontSizes(desktopPx)
+  return `clamp(${mobile}px, calc(${mobile}px + (${desktop} - ${mobile}) * ((100cqw - ${FLUID_MOBILE_WIDTH_PX}px) / ${FLUID_WIDTH_SPAN_PX})), ${desktop}px)`
 }
 
 const lineHeightByRole: Record<TypographyRole, number> = {
@@ -148,7 +237,7 @@ export function typographyPresentation(
   return {
     className: [fontClass[roleStyle.family], weightClass[roleStyle.weight], roleExtras[role]].filter(Boolean).join(' '),
     style: {
-      fontSize: `${roleStyle.sizePx}px`,
+      fontSize: fluidFontSizeFromDesktop(roleStyle.sizePx),
       lineHeight: lineHeightByRole[role],
     },
   }
@@ -180,13 +269,13 @@ export function bodyClass(style: BlockStyle): string {
 }
 
 export function mutedClass(): string {
-  return 'text-[#5C6B8A]'
+  return textClass.navyMuted
 }
 
 export function accentButtonClass(variant: 'default' | 'onDark' = 'default'): string {
   const base = [
-    'inline-flex min-h-11 items-center justify-center rounded-full px-7 py-3.5 sm:min-h-12 sm:px-8 sm:py-4',
-    'text-sm sm:text-base font-semibold shadow-lg transition duration-200',
+    'inline-flex w-full min-h-11 items-center justify-center rounded-full px-6 py-3.5 @sm:w-auto @sm:min-h-12 @sm:px-8 @sm:py-4',
+    'text-sm @sm:text-base font-semibold shadow-lg transition duration-200',
     'hover:translate-y-[-1px] hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
     'cursor-pointer',
   ]
@@ -206,10 +295,10 @@ export function accentButtonClass(variant: 'default' | 'onDark' = 'default'): st
 
 export function ghostButtonClass(): string {
   return [
-    'hidden min-h-11 items-center justify-center rounded-full border border-[#1A3066]/15 px-5 py-2.5',
-    'text-sm font-semibold text-[#1A3066] transition duration-200',
+    'inline-flex min-h-10 items-center justify-center rounded-full border border-[#1A3066]/15 px-4 py-2',
+    'text-xs font-semibold text-[#1A3066] transition duration-200 @sm:min-h-11 @sm:px-5 @sm:py-2.5 @sm:text-sm',
     'hover:border-[#1A3066]/30 hover:bg-[#E3F2FD] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A3066]',
-    'sm:inline-flex cursor-pointer',
+    'cursor-pointer',
   ].join(' ')
 }
 
@@ -227,35 +316,35 @@ export function contentAlignClass(align: AlignToken): string {
     center: 'items-center text-center',
     right: 'items-end text-right',
   }
-  return ['flex flex-col gap-6 sm:gap-8', map[align]].join(' ')
+  return ['flex flex-col gap-6 @sm:gap-8', map[align]].join(' ')
 }
 
 export function statCardClass(): string {
   return [
-    'rounded-2xl border border-[#1A3066]/10 bg-white p-4 shadow-sm sm:p-5',
+    'rounded-2xl border border-[#1A3066]/10 bg-white p-4 shadow-sm @sm:p-5',
     'transition duration-200 hover:border-[#1A3066]/15 hover:shadow-md',
   ].join(' ')
 }
 
 export function serviceCardClass(): string {
   return [
-    'flex h-full flex-col rounded-2xl border border-[#1A3066]/10 bg-white p-6 sm:p-7',
+    'flex h-full flex-col rounded-2xl border border-[#1A3066]/10 bg-white p-5 @sm:p-7',
     'shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-[#1A3066]/15 hover:shadow-md',
   ].join(' ')
 }
 
 export function featuredServiceCardClass(): string {
   return [
-    'relative flex h-full flex-col overflow-hidden rounded-2xl border border-[#E63946]/25 bg-white p-6 sm:p-7',
+    'relative flex h-full flex-col overflow-hidden rounded-2xl border border-[#E63946]/25 bg-white p-5 @sm:p-7',
     'shadow-lg shadow-[#1A3066]/10 ring-1 ring-[#E63946]/10',
     'transition duration-200 hover:-translate-y-1 hover:shadow-xl',
   ].join(' ')
 }
 
-export function ctaPanelClass(onNavy: boolean): string {
+export function ctaPanelClass(onDark: boolean): string {
   return [
-    'rounded-2xl border px-6 py-10 sm:rounded-3xl sm:px-10 sm:py-14 lg:px-16',
-    onNavy
+    'rounded-2xl border px-5 py-8 @sm:rounded-3xl @sm:px-10 @sm:py-14 @lg:px-16',
+    onDark
       ? 'border-white/10 bg-white/[0.04] backdrop-blur-sm'
       : 'border-[#1A3066]/10 bg-white shadow-xl shadow-[#1A3066]/10',
   ].join(' ')
@@ -264,13 +353,32 @@ export function ctaPanelClass(onNavy: boolean): string {
 export function footerLinkClass(): string {
   return [
     'inline-flex min-h-11 items-center gap-2.5 text-sm font-medium opacity-90 transition duration-200',
-    'hover:text-[#E63946] hover:opacity-100 sm:text-base sm:justify-end',
+    'hover:text-[#E63946] hover:opacity-100 @sm:text-base @sm:justify-end',
     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white',
   ].join(' ')
 }
 
 export function highlightClass(): string {
-  return 'text-[#E63946]'
+  return textClass.accent
+}
+
+/** Légère surcouche décorative du hero — respecte le fond palette */
+export function heroBackgroundWashClass(style: BlockStyle): string {
+  if (isDarkBackgroundValue(style.color.bg)) {
+    return 'bg-gradient-to-b from-black/15 via-transparent to-black/25'
+  }
+  if (isPaletteToken(style.color.bg) && style.color.bg === 'white') {
+    return 'bg-gradient-to-b from-white via-white/95 to-[#f8fafc]'
+  }
+  if (isWhiteishBackground(style.color.bg)) {
+    return 'bg-gradient-to-b from-white via-white/95 to-[#f8fafc]'
+  }
+  return 'bg-gradient-to-b from-[#E3F2FD] via-white/95 to-white'
+}
+
+/** Bordure de section adaptée au fond */
+export function sectionBorderClass(style: BlockStyle): string {
+  return isDarkBackgroundValue(style.color.bg) ? 'border-white/10' : 'border-[#1A3066]/10'
 }
 
 /** @deprecated */

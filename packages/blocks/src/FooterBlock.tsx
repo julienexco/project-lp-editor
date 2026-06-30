@@ -1,6 +1,6 @@
 import type { BlockProps } from '@lp-studio/types'
 import { resolveTypographyRole } from '@lp-studio/registry'
-import { containerClass, footerLinkClass, sectionSpacing, sectionTheme } from '@lp-studio/tokens'
+import { containerClass, footerLinkClass, primaryTextClass, secondaryTextClass, sectionBorderClass, sectionColorStyle, sectionSpacing, sectionTheme } from '@lp-studio/tokens'
 import { BrandLogo } from './BrandLogo'
 import { LinkIcon, MailIcon } from './decorations'
 import { EditableText } from './EditableText'
@@ -12,15 +12,15 @@ export function FooterBlock({ content, style, editable, onEdit }: BlockProps<'fo
     caption: resolveTypographyRole('footer', style, 'caption'),
   }
   const t = {
-    body: typoProps(typo.body, 'body'),
-    caption: typoProps(typo.caption, 'caption', 'max-w-md opacity-75'),
+    body: typoProps(typo.body, 'body', primaryTextClass(style)),
+    caption: typoProps(typo.caption, 'caption', 'max-w-md', secondaryTextClass(style)),
   }
 
   return (
-    <footer className={[sectionTheme(style), sectionSpacing(style), 'relative border-t border-white/10'].join(' ')}>
+    <footer className={[sectionTheme(style), sectionSpacing(style), 'relative border-t', sectionBorderClass(style)].join(' ')} style={sectionColorStyle(style)}>
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#E63946] via-[#E63946]/50 to-transparent" />
       <div className={containerClass()}>
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr] lg:items-center lg:gap-12">
+        <div className="grid gap-8 @sm:grid-cols-2 @lg:grid-cols-[1.5fr_1fr] @lg:items-center @lg:gap-12">
           <div className="space-y-4">
             {content.showLogo ? (
               <BrandLogo alt={content.brandName} variant="footer" />
@@ -46,7 +46,7 @@ export function FooterBlock({ content, style, editable, onEdit }: BlockProps<'fo
             />
           </div>
 
-          <div className="flex flex-col gap-3 sm:items-end">
+          <div className="flex flex-col gap-3 @sm:items-end">
             {editable ? (
               <span className={footerLinkClass()}>
                 <MailIcon />

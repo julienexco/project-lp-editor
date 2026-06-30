@@ -2,12 +2,17 @@ import type { BlockProps } from '@lp-studio/types'
 import { resolveTypographyRole } from '@lp-studio/registry'
 import {
   accentButtonClass,
+  cardPrimaryTextClass,
+  cardSecondaryTextClass,
   containerClass,
   ghostButtonClass,
   highlightClass,
-  mutedClass,
+  heroBackgroundWashClass,
+  primaryTextClass,
+  secondaryTextClass,
   navBarClass,
   sectionSpacing,
+  sectionColorStyle,
   sectionTheme,
   statCardClass,
 } from '@lp-studio/tokens'
@@ -26,11 +31,11 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
     caption: resolveTypographyRole('hero', style, 'caption'),
   }
   const t = {
-    eyebrow: typoProps(typo.eyebrow, 'eyebrow', mutedClass()),
-    h1: typoProps(typo.h1, 'h1'),
-    body: typoProps(typo.body, 'body', mutedClass()),
-    stat: typoProps(typo.stat, 'stat', 'text-[#1A3066]'),
-    caption: typoProps(typo.caption, 'caption', mutedClass()),
+    eyebrow: typoProps(typo.eyebrow, 'eyebrow', secondaryTextClass(style)),
+    h1: typoProps(typo.h1, 'h1', primaryTextClass(style)),
+    body: typoProps(typo.body, 'body', secondaryTextClass(style)),
+    stat: typoProps(typo.stat, 'stat', cardPrimaryTextClass()),
+    caption: typoProps(typo.caption, 'caption', cardSecondaryTextClass()),
   }
 
   const ctaButton = editable ? (
@@ -96,7 +101,7 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
         field="titleHighlight"
         editable={editable}
         onEdit={onEdit}
-        className={[centered ? `mt-2 block ${highlightClass()}` : highlightClass(), t.h1.className].join(' ')}
+        className={[centered ? `mt-2 block ${highlightClass()}` : `block @max-sm:mt-2 @sm:inline ${highlightClass()}`, t.h1.className].join(' ')}
         style={t.h1.style}
         as="span"
       />
@@ -104,9 +109,9 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
   )
 
   return (
-    <section className={[sectionTheme(style), 'relative overflow-hidden'].join(' ')}>
+    <section className={[sectionTheme(style), 'relative overflow-hidden'].join(' ')} style={sectionColorStyle(style)}>
       <HeroGridPattern />
-      <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#E3F2FD] via-white/95 to-white" />
+      <div aria-hidden className={['pointer-events-none absolute inset-0', heroBackgroundWashClass(style)].join(' ')} />
       <div
         aria-hidden
         className="pointer-events-none absolute -left-20 top-24 h-64 w-64 rounded-full bg-[#E63946]/[0.07] blur-3xl"
@@ -118,7 +123,7 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
 
       {content.showLogo ? (
         <header className={navBarClass()}>
-          <div className={`${containerClass()} flex items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8`}>
+          <div className={`${containerClass()} flex flex-wrap items-center justify-between gap-3 px-4 py-3 @sm:gap-4 @sm:py-3.5 @sm:px-6 @lg:px-8`}>
             <BrandLogo alt={content.eyebrow} variant="nav" />
             {navCta}
           </div>
@@ -150,18 +155,18 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
                 editable={editable}
                 onEdit={onEdit}
                 multiline
-                className={`mt-6 max-w-2xl sm:mt-7 ${t.body.className}`}
+                className={`mt-6 max-w-2xl @sm:mt-7 ${t.body.className}`}
                 style={t.body.style}
                 as="p"
               />
-              <div className="mt-8 sm:mt-10">{ctaButton}</div>
-              <div className="mt-12 grid w-full max-w-3xl grid-cols-2 gap-3 sm:mt-14 sm:grid-cols-4 sm:gap-4">
+              <div className="mt-8 flex w-full @sm:mt-10 @sm:w-auto">{ctaButton}</div>
+              <div className="mt-12 grid w-full max-w-3xl grid-cols-2 gap-3 @md:grid-cols-4 @sm:mt-14 @sm:gap-4">
                 {statCards(false)}
               </div>
             </div>
           ) : (
-            <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-14">
-              <div className="space-y-6 sm:space-y-8 lg:col-span-7">
+            <div className="grid items-center gap-8 @lg:grid-cols-12 @lg:gap-14">
+              <div className="space-y-6 @sm:space-y-8 @lg:col-span-7">
                 <div className="flex flex-col gap-3">
                   <AccentBar />
                   <EditableText
@@ -187,10 +192,10 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
                   style={t.body.style}
                   as="p"
                 />
-                {ctaButton}
+        <div className="mt-8 w-full @sm:mt-10 @sm:w-auto">{ctaButton}</div>
               </div>
-              <div className="lg:col-span-5">
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">{statCards(true)}</div>
+              <div className="@lg:col-span-5">
+                <div className="grid grid-cols-2 gap-3 @sm:gap-4">{statCards(true)}</div>
               </div>
             </div>
           )}
