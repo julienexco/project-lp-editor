@@ -224,7 +224,7 @@ const roleExtras: Record<TypographyRole, string> = {
   h1: 'tracking-tight text-balance',
   h2: 'tracking-tight text-balance',
   h3: 'tracking-tight',
-  eyebrow: 'uppercase tracking-[0.2em]',
+  eyebrow: 'uppercase tracking-[0.24em]',
   body: '',
   caption: '',
   stat: 'tracking-tight',
@@ -274,9 +274,9 @@ export function mutedClass(): string {
 
 export function accentButtonClass(variant: 'default' | 'onDark' = 'default'): string {
   const base = [
-    'group inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full px-7 py-3.5 @sm:w-auto @sm:min-h-12 @sm:px-9 @sm:py-4',
-    'text-sm @sm:text-base font-semibold shadow-lg transition duration-200',
-    'hover:translate-y-[-2px] hover:shadow-xl active:translate-y-0',
+    'group inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-lg px-7 py-3.5 @sm:w-auto @sm:min-h-12 @sm:px-8 @sm:py-3.5',
+    'text-sm @sm:text-base font-semibold tracking-tight transition duration-200',
+    'hover:translate-y-[-1px] active:translate-y-0',
     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
     'cursor-pointer',
   ]
@@ -284,21 +284,21 @@ export function accentButtonClass(variant: 'default' | 'onDark' = 'default'): st
   if (variant === 'onDark') {
     return [
       ...base,
-      'bg-[#E63946] text-white shadow-[#E63946]/35 hover:brightness-110 focus-visible:outline-white',
+      'bg-[#E63946] text-white shadow-sm shadow-[#E63946]/20 hover:brightness-110 focus-visible:outline-white',
     ].join(' ')
   }
 
   return [
     ...base,
-    'bg-[#E63946] text-white shadow-[#E63946]/30 hover:brightness-110 focus-visible:outline-[#1A3066]',
+    'bg-[#1A3066] text-white shadow-sm shadow-[#1A3066]/15 hover:bg-[#152a55] focus-visible:outline-[#1A3066]',
   ].join(' ')
 }
 
 export function navCtaButtonClass(): string {
   return [
-    'inline-flex min-h-10 items-center justify-center rounded-full px-5 py-2',
-    'text-xs font-semibold text-white transition duration-200 @sm:min-h-11 @sm:px-6 @sm:py-2.5 @sm:text-sm',
-    'bg-[#E63946] shadow-md shadow-[#E63946]/25 hover:brightness-110 hover:shadow-lg',
+    'inline-flex min-h-10 items-center justify-center rounded-lg border border-[#1A3066]/20 px-5 py-2',
+    'text-xs font-semibold text-[#1A3066] transition duration-200 @sm:min-h-11 @sm:px-6 @sm:py-2.5 @sm:text-sm',
+    'bg-transparent hover:border-[#1A3066]/35 hover:bg-[#1A3066]/[0.04]',
     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A3066]',
     'cursor-pointer',
   ].join(' ')
@@ -314,7 +314,7 @@ export function ghostButtonClass(): string {
 }
 
 export function navBarVisualClass(): string {
-  return 'border-b border-[#1A3066]/8 bg-white/95 shadow-[0_1px_24px_-4px_rgba(26,48,102,0.08)] backdrop-blur-lg'
+  return 'border-b border-[#1A3066]/6 bg-white/98 backdrop-blur-sm'
 }
 
 /** Header fixe en haut de la page (aperçu publié) */
@@ -394,35 +394,29 @@ export function contentAlignClass(align: AlignToken): string {
 
 export function statCardClass(): string {
   return [
-    'rounded-2xl border border-[#1A3066]/8 bg-white/90 p-4 backdrop-blur-sm @sm:p-5',
-    'shadow-[0_4px_24px_-8px_rgba(26,48,102,0.12)]',
-    'transition duration-200 hover:-translate-y-0.5 hover:border-[#1A3066]/15 hover:shadow-md',
+    'rounded-lg border border-[#1A3066]/10 bg-white p-4 @sm:p-5',
+    'transition duration-200 hover:border-[#1A3066]/20',
   ].join(' ')
 }
 
 export function serviceCardClass(): string {
   return [
-    'relative flex h-full flex-col rounded-2xl border border-[#1A3066]/8 bg-white p-5 @sm:p-7',
-    'shadow-[0_4px_24px_-10px_rgba(26,48,102,0.1)]',
-    'transition duration-200 hover:-translate-y-1 hover:border-[#1A3066]/15 hover:shadow-lg',
+    'relative flex h-full flex-col rounded-xl border border-[#1A3066]/10 bg-white p-5 @sm:p-6',
+    'transition duration-200 hover:border-[#1A3066]/18',
   ].join(' ')
 }
 
 export function featuredServiceCardClass(): string {
   return [
-    'relative flex h-full flex-col overflow-hidden rounded-2xl border border-[#E63946]/20 bg-white p-5 @sm:p-7',
-    'shadow-[0_8px_32px_-8px_rgba(26,48,102,0.15)] ring-1 ring-[#E63946]/10',
-    'transition duration-200 hover:-translate-y-1.5 hover:shadow-xl',
-    'before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-gradient-to-r before:from-[#E63946] before:via-[#E63946]/70 before:to-[#1A3066]/30',
+    'relative flex h-full flex-col rounded-xl border border-[#1A3066]/15 bg-white p-5 @sm:p-6',
+    'border-l-[3px] border-l-[#E63946] transition duration-200 hover:border-[#1A3066]/22',
   ].join(' ')
 }
 
 export function ctaPanelClass(onDark: boolean): string {
   return [
-    'rounded-2xl border px-6 py-10 @sm:rounded-3xl @sm:px-12 @sm:py-16 @lg:px-20',
-    onDark
-      ? 'border-white/12 bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-sm'
-      : 'border-[#1A3066]/10 bg-white shadow-2xl shadow-[#1A3066]/12',
+    'rounded-xl border px-6 py-10 @sm:px-10 @sm:py-14 @lg:px-14',
+    onDark ? 'border-white/10 bg-white/[0.03]' : 'border-[#1A3066]/10 bg-white',
   ].join(' ')
 }
 

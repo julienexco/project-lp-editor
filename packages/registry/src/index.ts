@@ -8,3 +8,4 @@ export {
   typographyRoleLabels,
 } from './typography'
 export { normalizeBlockStyle, normalizePageBlocks } from './normalize-style'
+export { getBlockLabel } from './block-label'

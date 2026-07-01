@@ -41,16 +41,7 @@ export function CTABlock({ content, style, editable, onEdit, onStyleEdit }: Bloc
   return (
     <section id="contact" className={[sectionTheme(style), sectionSpacing(style), 'relative overflow-hidden'].join(' ')} style={sectionColorStyle(style)}>
       {onDark ? (
-        <>
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -right-20 top-1/2 h-80 w-80 -translate-y-1/2 rounded-full bg-[#E63946]/20 blur-3xl"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-white/[0.04] blur-3xl"
-          />
-        </>
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/10" />
       ) : null}
 
       <div className={`${containerClass()} relative z-10`}>

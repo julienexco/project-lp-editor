@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { BlockRenderer, applyContentField } from '@lp-studio/blocks'
-import { blockRegistry, normalizePageBlocks, resolveTypographyRole } from '@lp-studio/registry'
+import { blockRegistry, getBlockLabel, normalizePageBlocks, resolveTypographyRole } from '@lp-studio/registry'
 import type { BlockInstance, BlockStyle, BlockType, ColorValue, PageRecord, TypographyRole, TypographyRoleStyle } from '@lp-studio/types'
 import { isPaletteToken, mergePageCustomColors, registerPageCustomColor, removePageCustomColor } from '@lp-studio/tokens'
 import { BlockContextEditor } from './BlockContextEditor'
@@ -118,9 +118,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
   }, [])
 
   const effectivePreviewWidth = isNativeNarrow ? '100%' : PREVIEW_VIEWPORTS[previewViewport].width
-  const selectedBlockLabel = selectedBlock
-    ? blockRegistry[selectedBlock.type as BlockType]?.label
-    : null
+  const selectedBlockLabel = selectedBlock ? getBlockLabel(selectedBlock, blockRegistry) : null
 
   const runSave = useCallback(async () => {
     if (saveInFlightRef.current) {
@@ -207,6 +205,22 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
       scheduleSave()
     },
     [scheduleSave],
+  )
+
+  const updateBlockLabel = useCallback(
+    (blockId: string, label: string | undefined) => {
+      updateBlocks((blocks) =>
+        blocks.map((b) => {
+          if (b.id !== blockId) return b
+          if (!label) {
+            const { label: _removed, ...rest } = b
+            return rest as BlockInstance
+          }
+          return { ...b, label }
+        }),
+      )
+    },
+    [updateBlocks],
   )
 
   const updateContent = (field: string, value: unknown) => {
@@ -438,6 +452,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
                   setSelectedId(id)
                   closeContextEditor()
                 }}
+                onRename={updateBlockLabel}
                 registry={blockRegistry}
               />
             </EditorCollapsibleSection>

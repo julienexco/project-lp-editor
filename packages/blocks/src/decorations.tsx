@@ -6,8 +6,8 @@ export function HeroGridPattern() {
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <pattern id="lp-hero-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-          <path d="M40 0H0V40" fill="none" stroke="#1A3066" strokeOpacity="0.05" />
+        <pattern id="lp-hero-grid" width="48" height="48" patternUnits="userSpaceOnUse">
+          <path d="M48 0H0V48" fill="none" stroke="#1A3066" strokeOpacity="0.03" />
         </pattern>
         <linearGradient id="lp-hero-fade" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#E3F2FD" stopOpacity="0.4" />
@@ -21,12 +21,7 @@ export function HeroGridPattern() {
 }
 
 export function AccentBar() {
-  return (
-    <span
-      aria-hidden
-      className="inline-block h-1 w-12 rounded-full bg-gradient-to-r from-[#E63946] via-[#E63946]/80 to-[#1A3066]/30"
-    />
-  )
+  return <span aria-hidden className="inline-block h-px w-14 bg-[#1A3066]/25" />
 }
 
 export function CtaArrowIcon() {
@@ -37,7 +32,7 @@ export function CtaArrowIcon() {
   )
 }
 
-export function ServiceIcon({ variant }: { variant: 'coaching' | 'team' | 'pilot' }) {
+export function ServiceIcon({ variant }: { variant: 'coaching' | 'team' | 'pilot' | 'audit' | 'strategy' | 'execute' | 'channel' | 'stack' | 'toolkit' }) {
   const paths = {
     coaching: (
       <path
@@ -60,6 +55,38 @@ export function ServiceIcon({ variant }: { variant: 'coaching' | 'team' | 'pilot
         <path d="M4 14l4-1.5 9-9 2.5 2.5-9 9L4 14z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
         <path d="M13 5l2.5 2.5" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
         <path d="M4 20h16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+      </>
+    ),
+    audit: (
+      <>
+        <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="1.75" />
+        <path d="M16 16l4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+      </>
+    ),
+    strategy: (
+      <>
+        <path d="M4 6h16M4 12h10M4 18h14" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+        <circle cx="18" cy="12" r="2" fill="currentColor" />
+      </>
+    ),
+    execute: (
+      <path d="M13 3L5 14h6l-1 7 9-12h-6l1-6z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+    ),
+    channel: (
+      <>
+        <rect x="4" y="5" width="16" height="14" rx="2" stroke="currentColor" strokeWidth="1.75" />
+        <path d="M4 10h16" stroke="currentColor" strokeWidth="1.75" />
+      </>
+    ),
+    stack: (
+      <>
+        <path d="M12 4l8 4-8 4-8-4 8-4z" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+        <path d="M4 12l8 4 8-4M4 16l8 4 8-4" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round" />
+      </>
+    ),
+    toolkit: (
+      <>
+        <path d="M14 4h6v6M10 20H4v-6M20 10l-8 8M4 4l6 6" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
       </>
     ),
   }

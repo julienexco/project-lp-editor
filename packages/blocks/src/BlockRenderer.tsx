@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import type { BlockInstance, BlockType, CtaContent, FeatureGridContent, FooterContent, HeroContent, NavbarContent, TypographyRole } from '@lp-studio/types'
-import { blockRegistry } from '@lp-studio/registry'
+import { blockRegistry, getBlockLabel } from '@lp-studio/registry'
 import { CTABlock } from './CTABlock'
 import { FeatureGridBlock } from './FeatureGridBlock'
 import { FooterBlock } from './FooterBlock'
@@ -35,7 +35,7 @@ export function BlockRenderer({ blocks, selectedId, onSelect, onBlockDoubleClick
       {sorted.map((block) => {
         const isSelected = selectedId === block.id
         const hasSelection = Boolean(selectedId && onSelect)
-        const label = blockRegistry[block.type as BlockType]?.label ?? block.type
+        const label = getBlockLabel(block, blockRegistry)
 
         const isNavbar = block.type === 'navbar'
 

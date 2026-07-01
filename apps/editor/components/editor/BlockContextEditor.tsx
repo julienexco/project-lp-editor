@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import type { AlignToken, BlockInstance, ColorValue, TypographyRole, TypographyRoleStyle } from '@lp-studio/types'
-import { blockRegistry, blockTypographyRoles, typographyRoleLabels } from '@lp-studio/registry'
+import { blockRegistry, blockTypographyRoles, getBlockLabel, typographyRoleLabels } from '@lp-studio/registry'
 import { backgroundPaletteTokens, textPaletteTokens } from '@lp-studio/tokens'
 import { PalettePicker } from './PalettePicker'
 import { TypographyRoleControls } from './TypographyRoleControls'
@@ -49,7 +49,7 @@ export function BlockContextEditor({
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [onClose])
 
-  const label = blockRegistry[block.type].label
+  const label = getBlockLabel(block, blockRegistry)
 
   return (
     <div className="absolute inset-0 z-40 flex justify-end p-3 sm:p-4" onClick={onClose} role="presentation">

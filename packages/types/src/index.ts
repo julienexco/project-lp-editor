@@ -95,6 +95,8 @@ export type BlockContentMap = {
 export type BlockInstance<T extends BlockType = BlockType> = {
   id: string
   type: T
+  /** Nom affiché dans l'éditeur (distinct du type de bloc) */
+  label?: string
   content: BlockContentMap[T]
   style: BlockStyle
   order: number

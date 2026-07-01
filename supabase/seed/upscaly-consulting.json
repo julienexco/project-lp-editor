@@ -9,17 +9,34 @@
       "type": "navbar",
       "order": 0,
       "content": {
-        "brandAlt": "Upscaly Consulting — conseil en croissance B2B",
-        "ctaLabel": "Audit gratuit",
+        "brandAlt": "Upscaly — growth studio B2B",
+        "ctaLabel": "Audit offert",
         "ctaHref": "#contact",
         "showLogo": true
       },
       "style": {
         "align": "center",
-        "color": { "bg": "white", "text": "navy" },
-        "font": { "family": "poppins", "size": "sm", "weight": "medium" },
-        "spacing": { "marginY": "tight", "paddingX": "normal" },
-        "animation": "none"
+        "color": {
+          "bg": "white",
+          "text": "navy"
+        },
+        "font": {
+          "family": "inter",
+          "size": "sm",
+          "weight": "medium"
+        },
+        "spacing": {
+          "marginY": "tight",
+          "paddingX": "normal"
+        },
+        "animation": "none",
+        "typography": {
+          "body": {
+            "sizePx": 14,
+            "weight": "medium",
+            "family": "poppins"
+          }
+        }
       }
     },
     {
@@ -27,96 +44,358 @@
       "type": "hero",
       "order": 1,
       "content": {
-        "eyebrow": "Croissance · Acquisition · B2B",
-        "title": "Votre acquisition mérite",
-        "titleHighlight": "un système, pas un coup d'essai.",
-        "subtitle": "Nous aidons les dirigeants à structurer leur croissance : stratégie, exécution, automatisation. 45 minutes d'audit offert — vous repartez avec un plan clair, qu'on collabore ou non.",
-        "ctaLabel": "Réserver mon audit gratuit",
+        "eyebrow": "Growth studio · B2B",
+        "title": "Croissance directe.",
+        "titleHighlight": "Sans le bruit.",
+        "subtitle": "Audit, stratégie 360, exécution et optimisation — un seul partenaire pour structurer votre acquisition et shipper ce qui compte. 45 min d'audit offert. Plan clair. Zéro engagement.",
+        "ctaLabel": "Réserver l'audit",
         "ctaHref": "#contact",
         "stats": [
-          { "value": "50+", "label": "entreprises accompagnées" },
-          { "value": "10 ans", "label": "d'expertise terrain" },
-          { "value": "×3", "label": "pipeline moyen visé" },
-          { "value": "45 min", "label": "audit sans engagement" }
-        ]
-      },
-      "style": {
-        "align": "center",
-        "color": { "bg": "surface", "text": "navy" },
-        "font": { "family": "poppins", "size": "xl", "weight": "bold" },
-        "spacing": { "marginY": "xl", "paddingX": "normal" },
-        "animation": "slide-up"
-      }
-    },
-    {
-      "id": "b-services-001",
-      "type": "featureGrid",
-      "order": 2,
-      "content": {
-        "sectionTitle": "Trois façons d'accélérer votre croissance",
-        "items": [
           {
-            "title": "Coaching",
-            "tagline": "Vous pilotez, nous cartographions",
-            "description": "Sessions stratégiques sur mesure pour éviter les angles morts et prioriser ce qui génère du revenu. Idéal pour les fondateurs qui restent aux commandes."
+            "value": "01",
+            "label": "Audit"
           },
           {
-            "title": "Accompagnement",
-            "tagline": "Nous avançons main dans la main",
-            "description": "Rituels hebdomadaires, livrables concrets, votre équipe monte en compétence en même temps que les résultats. Le meilleur équilibre vitesse et autonomie."
+            "value": "02",
+            "label": "Stratégie 360"
           },
           {
-            "title": "Pilotage",
-            "tagline": "Nous prenons le relais",
-            "description": "De la stratégie d'acquisition à l'exécution opérationnelle : nous pilotons la croissance pendant que vous vous concentrez sur votre cœur de métier."
+            "value": "03",
+            "label": "Exécution"
+          },
+          {
+            "value": "04",
+            "label": "Optimisation"
           }
         ]
       },
       "style": {
-        "align": "center",
-        "color": { "bg": "white", "text": "navy" },
-        "font": { "family": "poppins", "size": "md", "weight": "normal" },
-        "spacing": { "marginY": "loose", "paddingX": "normal" },
-        "animation": "fade-in"
+        "align": "left",
+        "color": {
+          "bg": "white",
+          "text": "navy"
+        },
+        "font": {
+          "family": "inter",
+          "size": "xl",
+          "weight": "bold"
+        },
+        "spacing": {
+          "marginY": "xl",
+          "paddingX": "normal"
+        },
+        "animation": "fade-in",
+        "typography": {
+          "eyebrow": {
+            "sizePx": 11,
+            "weight": "medium",
+            "family": "inter"
+          },
+          "h1": {
+            "sizePx": 54,
+            "weight": "bold",
+            "family": "inter"
+          },
+          "body": {
+            "sizePx": 18,
+            "weight": "normal",
+            "family": "inter"
+          },
+          "stat": {
+            "sizePx": 28,
+            "weight": "bold",
+            "family": "inter"
+          },
+          "caption": {
+            "sizePx": 12,
+            "weight": "medium",
+            "family": "inter"
+          }
+        }
+      }
+    },
+    {
+      "id": "b-expertise-001",
+      "type": "featureGrid",
+      "label": "Expertise",
+      "order": 2,
+      "content": {
+        "sectionTitle": "Notre expertise",
+        "items": [
+          {
+            "title": "Audit",
+            "tagline": "Diagnostic sans filtre",
+            "description": "Acquisition, tracking, funnel, CRM, contenus. On identifie ce qui bloque la croissance et ce qui peut scaler — avec des priorités chiffrées."
+          },
+          {
+            "title": "Stratégie 360",
+            "tagline": "Prioriser. Aligner. Engager.",
+            "description": "Roadmap growth alignée business : canaux, messaging, offres, séquençage. Une vision claire pour l'équipe dirigeante et les équipes terrain."
+          },
+          {
+            "title": "Exécution & optimisation",
+            "tagline": "On ship. On mesure.",
+            "description": "Campagnes paid, SEO, outreach, automation, product marketing. Mise en production rapide, itérations data-driven, optimisation continue."
+          }
+        ]
+      },
+      "style": {
+        "align": "left",
+        "color": {
+          "bg": "white",
+          "text": "navy"
+        },
+        "font": {
+          "family": "inter",
+          "size": "md",
+          "weight": "normal"
+        },
+        "spacing": {
+          "marginY": "loose",
+          "paddingX": "normal"
+        },
+        "animation": "none",
+        "typography": {
+          "h2": {
+            "sizePx": 34,
+            "weight": "bold",
+            "family": "inter"
+          },
+          "h3": {
+            "sizePx": 20,
+            "weight": "bold",
+            "family": "inter"
+          },
+          "eyebrow": {
+            "sizePx": 11,
+            "weight": "medium",
+            "family": "inter"
+          },
+          "body": {
+            "sizePx": 16,
+            "weight": "normal",
+            "family": "inter"
+          }
+        }
+      }
+    },
+    {
+      "id": "b-execution-001",
+      "type": "featureGrid",
+      "label": "Exécution",
+      "order": 3,
+      "content": {
+        "sectionTitle": "Exécution",
+        "items": [
+          {
+            "title": "Paid & performance",
+            "tagline": "Budgets qui performent",
+            "description": "Google Ads, Meta Ads (paid), tracking server & client-side, attribution, optimisation budgets et créas. Stratégie paid intégrée au funnel."
+          },
+          {
+            "title": "Organic & visibilité",
+            "tagline": "Être trouvé. Être choisi.",
+            "description": "SEO, GEO, content strategy, product marketing. Positionnement sur les requêtes qui génèrent du pipeline qualifié."
+          },
+          {
+            "title": "Outbound & automation",
+            "tagline": "Scale sans friction",
+            "description": "Outreach, séquences multicanales, work automation, prompt engineering (IA), stack growth. Moins de tâches manuelles, plus de volume utile."
+          }
+        ]
+      },
+      "style": {
+        "align": "left",
+        "color": {
+          "bg": "surface",
+          "text": "navy"
+        },
+        "font": {
+          "family": "inter",
+          "size": "md",
+          "weight": "normal"
+        },
+        "spacing": {
+          "marginY": "normal",
+          "paddingX": "normal"
+        },
+        "animation": "none",
+        "typography": {
+          "h2": {
+            "sizePx": 34,
+            "weight": "bold",
+            "family": "inter"
+          },
+          "h3": {
+            "sizePx": 20,
+            "weight": "bold",
+            "family": "inter"
+          },
+          "eyebrow": {
+            "sizePx": 11,
+            "weight": "medium",
+            "family": "inter"
+          },
+          "body": {
+            "sizePx": 16,
+            "weight": "normal",
+            "family": "inter"
+          }
+        }
+      }
+    },
+    {
+      "id": "b-services-plus-001",
+      "type": "featureGrid",
+      "label": "Stack & livrables",
+      "order": 4,
+      "content": {
+        "sectionTitle": "Stack & livrables",
+        "items": [
+          {
+            "title": "Conversion & CRM",
+            "tagline": "Du clic au client",
+            "description": "Optimisation site (CRO), landing pages performantes, lead scoring CRM, brief créatif, rapports CRM. Chaque étape du funnel est mesurée."
+          },
+          {
+            "title": "Data & média",
+            "tagline": "Décider avec des faits",
+            "description": "Tracking client-side, data visualisation, sélection de médias spécialisés, reporting actionnable pour les équipes sales et marketing."
+          },
+          {
+            "title": "Contenus & assets",
+            "tagline": "Autorité qui convertit",
+            "description": "White papers, ebooks, contenus SEO, stack growth (outils), automatisation des workflows. Des assets qui nourrissent l'acquisition long terme."
+          }
+        ]
+      },
+      "style": {
+        "align": "left",
+        "color": {
+          "bg": "white",
+          "text": "navy"
+        },
+        "font": {
+          "family": "inter",
+          "size": "md",
+          "weight": "normal"
+        },
+        "spacing": {
+          "marginY": "loose",
+          "paddingX": "normal"
+        },
+        "animation": "none",
+        "typography": {
+          "h2": {
+            "sizePx": 34,
+            "weight": "bold",
+            "family": "inter"
+          },
+          "h3": {
+            "sizePx": 20,
+            "weight": "bold",
+            "family": "inter"
+          },
+          "eyebrow": {
+            "sizePx": 11,
+            "weight": "medium",
+            "family": "inter"
+          },
+          "body": {
+            "sizePx": 16,
+            "weight": "normal",
+            "family": "inter"
+          }
+        }
       }
     },
     {
       "id": "b-cta-001",
       "type": "cta",
-      "order": 3,
+      "order": 5,
       "content": {
-        "title": "45 minutes pour transformer l'incertitude en plan d'action.",
-        "description": "En un appel, nous analysons votre acquisition actuelle, identifions les 3 leviers à activer en priorité et vous donnons une feuille de route actionnable — sans engagement de votre part.",
-        "buttonLabel": "Réserver mon audit gratuit",
+        "title": "Un audit. Un plan. Pas de blabla.",
+        "description": "45 minutes pour cartographier votre acquisition, prioriser 3 leviers et repartir avec une feuille de route — même si on ne travaille pas ensemble.",
+        "buttonLabel": "Réserver l'audit",
         "buttonHref": "#contact"
       },
       "style": {
-        "align": "center",
-        "color": { "bg": "navy", "text": "white" },
-        "font": { "family": "poppins", "size": "lg", "weight": "bold" },
-        "spacing": { "marginY": "loose", "paddingX": "normal" },
-        "animation": "fade-in"
+        "align": "left",
+        "color": {
+          "bg": "navy",
+          "text": "white"
+        },
+        "font": {
+          "family": "inter",
+          "size": "lg",
+          "weight": "bold"
+        },
+        "spacing": {
+          "marginY": "loose",
+          "paddingX": "normal"
+        },
+        "animation": "none",
+        "typography": {
+          "h2": {
+            "sizePx": 36,
+            "weight": "bold",
+            "family": "inter"
+          },
+          "body": {
+            "sizePx": 17,
+            "weight": "normal",
+            "family": "inter"
+          }
+        }
       }
     },
     {
       "id": "b-footer-001",
       "type": "footer",
-      "order": 4,
+      "order": 6,
       "content": {
         "brandName": "Upscaly Consulting",
         "email": "contact@upscaly.com",
         "linkedinUrl": "https://linkedin.com",
         "linkedinLabel": "LinkedIn",
-        "copyright": "© 2026 Upscaly Consulting — Conseil en croissance B2B",
+        "copyright": "© 2026 Upscaly — Growth studio B2B",
         "showLogo": true
       },
       "style": {
         "align": "left",
-        "color": { "bg": "navy", "text": "white" },
-        "font": { "family": "poppins", "size": "sm", "weight": "normal" },
-        "spacing": { "marginY": "tight", "paddingX": "normal" },
-        "animation": "none"
+        "color": {
+          "bg": "navy",
+          "text": "white"
+        },
+        "font": {
+          "family": "inter",
+          "size": "sm",
+          "weight": "normal"
+        },
+        "spacing": {
+          "marginY": "tight",
+          "paddingX": "normal"
+        },
+        "animation": "none",
+        "typography": {
+          "body": {
+            "sizePx": 15,
+            "weight": "normal",
+            "family": "inter"
+          },
+          "caption": {
+            "sizePx": 13,
+            "weight": "medium",
+            "family": "poppins"
+          }
+        }
       }
     }
-  ]
+  ],
+  "config": {},
+  "meta": {
+    "customColors": []
+  },
+  "schema_version": "1.0.0",
+  "updated_at": "2026-07-01T15:15:07.349Z"
 }

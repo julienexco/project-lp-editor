@@ -14,7 +14,6 @@ import {
   sectionTheme,
   serviceCardClass,
   serviceGridClass,
-  paletteTextClass,
 } from '@lp-studio/tokens'
 import { AccentBar, ServiceIcon } from './decorations'
 import { EditableText } from './EditableText'
@@ -36,7 +35,7 @@ export function FeatureGridBlock({ content, style, editable, onEdit, onStyleEdit
     body: typoProps(typo.body, 'body', cardSecondaryTextClass()),
   }
 
-  const serviceIcons = ['coaching', 'team', 'pilot'] as const
+  const serviceIcons = ['audit', 'strategy', 'execute', 'channel', 'stack', 'toolkit'] as const
 
   return (
     <section className={[sectionTheme(style), sectionSpacing(style), 'relative'].join(' ')} style={sectionColorStyle(style)}>
@@ -70,13 +69,13 @@ export function FeatureGridBlock({ content, style, editable, onEdit, onStyleEdit
             >
               <span
                 className={[
-                  'inline-flex h-11 w-11 items-center justify-center rounded-xl',
+                  'inline-flex h-10 w-10 items-center justify-center rounded-lg border',
                   index === featuredIndex
-                    ? 'bg-[#E63946] text-white shadow-lg shadow-[#E63946]/30'
-                    : `bg-[#E3F2FD] ${paletteTextClass('navy')}`,
+                    ? 'border-[#1A3066] bg-[#1A3066] text-white'
+                    : 'border-[#1A3066]/12 bg-white text-[#1A3066]',
                 ].join(' ')}
               >
-                <ServiceIcon variant={serviceIcons[index] ?? 'coaching'} />
+                <ServiceIcon variant={serviceIcons[index % serviceIcons.length]} />
               </span>
               <EditableText
                 value={item.title}

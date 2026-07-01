@@ -112,14 +112,6 @@ export function HeroBlock({ content, style, editable, onEdit, onStyleEdit }: Blo
     <section className={[sectionTheme(style), 'relative overflow-hidden'].join(' ')} style={sectionColorStyle(style)}>
       <HeroGridPattern />
       <div aria-hidden className={['pointer-events-none absolute inset-0', heroBackgroundWashClass(style)].join(' ')} />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-16 h-72 w-72 -translate-x-1/2 rounded-full bg-[#E63946]/[0.06] blur-3xl"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-24 top-0 h-80 w-80 rounded-full bg-[#1A3066]/[0.05] blur-3xl"
-      />
 
       <div className={[sectionSpacing(style), 'relative z-10'].join(' ')}>
         <div className={containerClass()}>
