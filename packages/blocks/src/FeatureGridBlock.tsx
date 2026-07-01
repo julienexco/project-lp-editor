@@ -17,7 +17,7 @@ import { AccentBar } from './decorations'
 import { EditableText } from './EditableText'
 import { typoProps } from './typo'
 
-export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProps<'featureGrid'>) {
+export function FeatureGridBlock({ content, style, editable, onEdit, onStyleEdit }: BlockProps<'featureGrid'>) {
   const centered = style.align === 'center'
   const featuredIndex = Math.min(1, content.items.length - 1)
   const typo = {
@@ -49,6 +49,8 @@ export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProp
             field="sectionTitle"
             editable={editable}
             onEdit={onEdit}
+            onStyleEdit={onStyleEdit}
+            typographyRole="h2"
             className={t.h2.className}
             style={t.h2.style}
             as="h2"
@@ -76,6 +78,8 @@ export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProp
                 field={`items.${index}.title`}
                 editable={editable}
                 onEdit={onEdit}
+                onStyleEdit={onStyleEdit}
+                typographyRole="h3"
                 className={`mt-5 ${t.h3.className}`}
                 style={t.h3.style}
                 as="h3"
@@ -85,6 +89,8 @@ export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProp
                 field={`items.${index}.tagline`}
                 editable={editable}
                 onEdit={onEdit}
+                onStyleEdit={onStyleEdit}
+                typographyRole="eyebrow"
                 className={`mt-2 ${t.eyebrow.className}`}
                 style={t.eyebrow.style}
                 as="p"
@@ -94,6 +100,8 @@ export function FeatureGridBlock({ content, style, editable, onEdit }: BlockProp
                 field={`items.${index}.description`}
                 editable={editable}
                 onEdit={onEdit}
+                onStyleEdit={onStyleEdit}
+                typographyRole="body"
                 multiline
                 className={`mt-4 flex-1 ${t.body.className}`}
                 style={t.body.style}

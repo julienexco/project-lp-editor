@@ -1,3 +1,4 @@
+export { NavbarBlock } from './NavbarBlock'
 export { BlockRenderer } from './BlockRenderer'
 export { HeroBlock } from './HeroBlock'
 export { FeatureGridBlock } from './FeatureGridBlock'

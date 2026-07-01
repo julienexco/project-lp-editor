@@ -24,6 +24,21 @@ export const defaultBlockStyle: BlockStyle = {
 }
 
 export const blockRegistry = {
+  navbar: {
+    label: 'Header',
+    contentSchema: {
+      brandAlt: { type: 'string', label: 'Texte alternatif logo', default: '' },
+      ctaLabel: { type: 'string', label: 'Bouton navigation', default: '' },
+      ctaHref: { type: 'url', label: 'Lien navigation', default: '#' },
+      showLogo: { type: 'boolean', label: 'Afficher le header', default: true },
+    },
+    defaultStyle: {
+      ...defaultBlockStyle,
+      color: { bg: 'white', text: 'navy' },
+      font: { family: 'poppins', size: 'sm', weight: 'medium' },
+      spacing: { marginY: 'tight', paddingX: 'normal' },
+    },
+  },
   hero: {
     label: 'Hero',
     contentSchema: {
@@ -33,7 +48,6 @@ export const blockRegistry = {
       subtitle: { type: 'string', label: 'Sous-titre', default: '' },
       ctaLabel: { type: 'string', label: 'Bouton CTA', default: '' },
       ctaHref: { type: 'url', label: 'Lien CTA', default: '#' },
-      showLogo: { type: 'boolean', label: 'Afficher le logo', default: true },
       stats: { type: 'stats', label: 'Chiffres clés', default: [] },
     },
     defaultStyle: {

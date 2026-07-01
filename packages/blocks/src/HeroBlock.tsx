@@ -5,12 +5,10 @@ import {
   cardPrimaryTextClass,
   cardSecondaryTextClass,
   containerClass,
-  ghostButtonClass,
   highlightClass,
   heroBackgroundWashClass,
   primaryTextClass,
   secondaryTextClass,
-  navBarClass,
   sectionSpacing,
   sectionColorStyle,
   sectionTheme,
@@ -21,7 +19,7 @@ import { AccentBar, HeroGridPattern } from './decorations'
 import { EditableText } from './EditableText'
 import { typoProps } from './typo'
 
-export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero'>) {
+export function HeroBlock({ content, style, editable, onEdit, onStyleEdit }: BlockProps<'hero'>) {
   const centered = style.align === 'center'
   const typo = {
     eyebrow: resolveTypographyRole('hero', style, 'eyebrow'),
@@ -40,20 +38,10 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
 
   const ctaButton = editable ? (
     <span className={accentButtonClass()}>
-      <EditableText value={content.ctaLabel} field="ctaLabel" editable={editable} onEdit={onEdit} as="span" />
+      <EditableText value={content.ctaLabel} field="ctaLabel" editable={editable} onEdit={onEdit} onStyleEdit={onStyleEdit} typographyRole="body" as="span" />
     </span>
   ) : (
     <a href={content.ctaHref} className={accentButtonClass()}>
-      {content.ctaLabel}
-    </a>
-  )
-
-  const navCta = editable ? (
-    <span className={ghostButtonClass()}>
-      <EditableText value={content.ctaLabel} field="ctaLabel" editable={editable} onEdit={onEdit} as="span" />
-    </span>
-  ) : (
-    <a href={content.ctaHref} className={ghostButtonClass()}>
       {content.ctaLabel}
     </a>
   )
@@ -69,6 +57,8 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
           field={`stats.${index}.value`}
           editable={editable}
           onEdit={onEdit}
+          onStyleEdit={onStyleEdit}
+          typographyRole="stat"
           className={t.stat.className}
           style={t.stat.style}
           as="p"
@@ -78,6 +68,8 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
           field={`stats.${index}.label`}
           editable={editable}
           onEdit={onEdit}
+          onStyleEdit={onStyleEdit}
+          typographyRole="caption"
           className={`mt-1 ${t.caption.className}`}
           style={t.caption.style}
           as="p"
@@ -92,6 +84,8 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
         field="title"
         editable={editable}
         onEdit={onEdit}
+        onStyleEdit={onStyleEdit}
+        typographyRole="h1"
         className={t.h1.className}
         style={t.h1.style}
         as="span"
@@ -101,6 +95,8 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
         field="titleHighlight"
         editable={editable}
         onEdit={onEdit}
+        onStyleEdit={onStyleEdit}
+        typographyRole="h1"
         className={[centered ? `mt-2 block ${highlightClass()}` : `block @max-sm:mt-2 @sm:inline ${highlightClass()}`, t.h1.className].join(' ')}
         style={t.h1.style}
         as="span"
@@ -121,15 +117,6 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
         className="pointer-events-none absolute -right-24 top-0 h-80 w-80 rounded-full bg-[#1A3066]/[0.05] blur-3xl"
       />
 
-      {content.showLogo ? (
-        <header className={navBarClass()}>
-          <div className={`${containerClass()} flex flex-wrap items-center justify-between gap-3 px-4 py-3 @sm:gap-4 @sm:py-3.5 @sm:px-6 @lg:px-8`}>
-            <BrandLogo alt={content.eyebrow} variant="nav" />
-            {navCta}
-          </div>
-        </header>
-      ) : null}
-
       <div className={[sectionSpacing(style), 'relative z-10'].join(' ')}>
         <div className={containerClass()}>
           {centered ? (
@@ -141,6 +128,8 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
                   field="eyebrow"
                   editable={editable}
                   onEdit={onEdit}
+                  onStyleEdit={onStyleEdit}
+                  typographyRole="eyebrow"
                   className={t.eyebrow.className}
                   style={t.eyebrow.style}
                   as="p"
@@ -154,6 +143,8 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
                 field="subtitle"
                 editable={editable}
                 onEdit={onEdit}
+                onStyleEdit={onStyleEdit}
+                typographyRole="body"
                 multiline
                 className={`mt-6 max-w-2xl @sm:mt-7 ${t.body.className}`}
                 style={t.body.style}
@@ -174,6 +165,8 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
                     field="eyebrow"
                     editable={editable}
                     onEdit={onEdit}
+                    onStyleEdit={onStyleEdit}
+                    typographyRole="eyebrow"
                     className={t.eyebrow.className}
                     style={t.eyebrow.style}
                     as="p"
@@ -187,6 +180,8 @@ export function HeroBlock({ content, style, editable, onEdit }: BlockProps<'hero
                   field="subtitle"
                   editable={editable}
                   onEdit={onEdit}
+                  onStyleEdit={onStyleEdit}
+                  typographyRole="body"
                   multiline
                   className={`max-w-xl ${t.body.className}`}
                   style={t.body.style}

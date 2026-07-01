@@ -1,4 +1,5 @@
-import type { BlockInstance, BlockStyle, BlockType, TypographyTheme } from '@lp-studio/types'
+import type { BlockInstance, BlockStyle, BlockType, HeroContent, TypographyTheme } from '@lp-studio/types'
+import { blockRegistry } from './block-registry'
 import {
   blockTypographyRoles,
   defaultTypographyByBlock,
@@ -47,8 +48,47 @@ export function normalizeBlockStyle(style: BlockStyle, blockType: BlockType): Bl
   }
 }
 
+type LegacyHeroContent = HeroContent & { showLogo?: boolean }
+
+function migrateNavbarFromHero(blocks: BlockInstance[]): BlockInstance[] {
+  if (blocks.some((b) => b.type === 'navbar')) return blocks
+
+  const hero = blocks.find((b) => b.type === 'hero')
+  if (!hero) return blocks
+
+  const heroContent = hero.content as LegacyHeroContent
+  if (!heroContent.showLogo) return blocks
+
+  const navbarDefaults = blockRegistry.navbar.defaultStyle
+  const minOrder = Math.min(...blocks.map((b) => b.order))
+
+  const navbar: BlockInstance = {
+    id: `b-navbar-${hero.id}`,
+    type: 'navbar',
+    order: minOrder - 1,
+    content: {
+      brandAlt: heroContent.eyebrow ?? '',
+      ctaLabel: heroContent.ctaLabel ?? '',
+      ctaHref: heroContent.ctaHref ?? '#',
+      showLogo: true,
+    },
+    style: normalizeBlockStyle(navbarDefaults, 'navbar'),
+  }
+
+  const { showLogo: _removed, ...heroContentNext } = heroContent
+  const updatedHero: BlockInstance = {
+    ...hero,
+    content: heroContentNext as HeroContent,
+  }
+
+  return [...blocks.map((b) => (b.id === hero.id ? updatedHero : b)), navbar]
+    .sort((a, b) => a.order - b.order)
+    .map((block, index) => ({ ...block, order: index }))
+}
+
 export function normalizePageBlocks(blocks: BlockInstance[]): BlockInstance[] {
-  return blocks.map((block) => ({
+  const migrated = migrateNavbarFromHero(blocks)
+  return migrated.map((block) => ({
     ...block,
     style: normalizeBlockStyle(block.style, block.type),
   }))

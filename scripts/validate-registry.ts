@@ -1,6 +1,7 @@
 import { blockTypes } from '../packages/registry/src/block-registry'
 
 const componentMap: Record<string, string> = {
+  navbar: 'NavbarBlock',
   hero: 'HeroBlock',
   featureGrid: 'FeatureGridBlock',
   cta: 'CTABlock',

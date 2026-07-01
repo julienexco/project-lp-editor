@@ -6,7 +6,7 @@ import { LinkIcon, MailIcon } from './decorations'
 import { EditableText } from './EditableText'
 import { typoProps } from './typo'
 
-export function FooterBlock({ content, style, editable, onEdit }: BlockProps<'footer'>) {
+export function FooterBlock({ content, style, editable, onEdit, onStyleEdit }: BlockProps<'footer'>) {
   const typo = {
     body: resolveTypographyRole('footer', style, 'body'),
     caption: resolveTypographyRole('footer', style, 'caption'),
@@ -30,6 +30,8 @@ export function FooterBlock({ content, style, editable, onEdit }: BlockProps<'fo
                 field="brandName"
                 editable={editable}
                 onEdit={onEdit}
+                onStyleEdit={onStyleEdit}
+                typographyRole="body"
                 className={t.body.className}
                 style={t.body.style}
                 as="p"
@@ -40,6 +42,8 @@ export function FooterBlock({ content, style, editable, onEdit }: BlockProps<'fo
               field="copyright"
               editable={editable}
               onEdit={onEdit}
+              onStyleEdit={onStyleEdit}
+              typographyRole="caption"
               className={t.caption.className}
               style={t.caption.style}
               as="p"
@@ -55,6 +59,8 @@ export function FooterBlock({ content, style, editable, onEdit }: BlockProps<'fo
                   field="email"
                   editable={editable}
                   onEdit={onEdit}
+                  onStyleEdit={onStyleEdit}
+                  typographyRole="body"
                   className={t.body.className}
                   style={t.body.style}
                   as="span"
@@ -74,6 +80,8 @@ export function FooterBlock({ content, style, editable, onEdit }: BlockProps<'fo
                   field="linkedinLabel"
                   editable={editable}
                   onEdit={onEdit}
+                  onStyleEdit={onStyleEdit}
+                  typographyRole="body"
                   className={t.body.className}
                   style={t.body.style}
                   as="span"

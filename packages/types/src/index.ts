@@ -1,4 +1,4 @@
-export type BlockType = 'hero' | 'featureGrid' | 'cta' | 'footer'
+export type BlockType = 'navbar' | 'hero' | 'featureGrid' | 'cta' | 'footer'
 
 export type PaletteToken = 'navy' | 'surface' | 'white' | 'accent' | 'navyMuted'
 /** Preset palette token or custom hex (#RRGGBB) */
@@ -23,6 +23,8 @@ export type TypographyRoleStyle = {
   sizePx: number
   weight: WeightToken
   family: FontFamilyToken
+  /** Couleur spécifique du rôle (sinon hérite de la section) */
+  textColor?: ColorValue
 }
 
 export type TypographyTheme = Partial<Record<TypographyRole, TypographyRoleStyle>>
@@ -44,6 +46,13 @@ export type FeatureItem = {
   description: string
 }
 
+export type NavbarContent = {
+  brandAlt: string
+  ctaLabel: string
+  ctaHref: string
+  showLogo: boolean
+}
+
 export type HeroContent = {
   eyebrow: string
   title: string
@@ -51,7 +60,6 @@ export type HeroContent = {
   subtitle: string
   ctaLabel: string
   ctaHref: string
-  showLogo: boolean
   stats: StatItem[]
 }
 
@@ -77,6 +85,7 @@ export type FooterContent = {
 }
 
 export type BlockContentMap = {
+  navbar: NavbarContent
   hero: HeroContent
   featureGrid: FeatureGridContent
   cta: CtaContent
@@ -113,10 +122,12 @@ export type PageMeta = {
 }
 
 export type ContentEditHandler = (field: string, value: string) => void
+export type StyleEditHandler = (field: string, role: TypographyRole) => void
 
 export type BlockProps<T extends BlockType> = {
   content: BlockContentMap[T]
   style: BlockStyle
   editable?: boolean
   onEdit?: ContentEditHandler
+  onStyleEdit?: StyleEditHandler
 }

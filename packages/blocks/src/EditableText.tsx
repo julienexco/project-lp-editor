@@ -1,23 +1,30 @@
 'use client'
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import type { TypographyRole } from '@lp-studio/types'
 
 type EditableTextProps = {
   value: string
   field: string
   editable?: boolean
   onEdit?: (field: string, value: string) => void
+  onStyleEdit?: (field: string, role: TypographyRole) => void
+  typographyRole?: TypographyRole
   className?: string
   style?: CSSProperties
   as?: 'p' | 'h1' | 'h2' | 'h3' | 'span'
   multiline?: boolean
 }
 
+const STYLE_CLICK_DELAY_MS = 280
+
 export function EditableText({
   value,
   field,
   editable,
   onEdit,
+  onStyleEdit,
+  typographyRole,
   className = '',
   style,
   as: Tag = 'span',
@@ -26,6 +33,7 @@ export function EditableText({
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(value)
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement>(null)
+  const styleClickTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     if (!editing) setDraft(value)
@@ -37,6 +45,12 @@ export function EditableText({
       inputRef.current.select()
     }
   }, [editing])
+
+  useEffect(() => {
+    return () => {
+      if (styleClickTimerRef.current) clearTimeout(styleClickTimerRef.current)
+    }
+  }, [])
 
   const commit = () => {
     const next = draft.trim()
@@ -51,6 +65,37 @@ export function EditableText({
 
   const stopBubble = (e: React.SyntheticEvent) => {
     e.stopPropagation()
+  }
+
+  const clearStyleTimer = () => {
+    if (styleClickTimerRef.current) {
+      clearTimeout(styleClickTimerRef.current)
+      styleClickTimerRef.current = null
+    }
+  }
+
+  const openStyleEditor = () => {
+    if (onStyleEdit && typographyRole) onStyleEdit(field, typographyRole)
+  }
+
+  const handleTextClick = (e: React.MouseEvent) => {
+    stopBubble(e)
+    if (!editable || !onStyleEdit || !typographyRole) return
+
+    if (e.detail === 3 && onEdit) {
+      clearStyleTimer()
+      setDraft(value)
+      setEditing(true)
+      return
+    }
+
+    if (e.detail === 2) {
+      clearStyleTimer()
+      styleClickTimerRef.current = setTimeout(() => {
+        styleClickTimerRef.current = null
+        openStyleEditor()
+      }, STYLE_CLICK_DELAY_MS)
+    }
   }
 
   if (!editable || !onEdit) {
@@ -120,20 +165,24 @@ export function EditableText({
     )
   }
 
+  const styleHint = onStyleEdit && typographyRole
+
   return (
     <Tag
+      data-editable-text
       className={[
         className,
         'cursor-text rounded-sm transition hover:outline hover:outline-1 hover:outline-[#E63946]/40',
       ].join(' ')}
       style={style}
-      title="Double-cliquer pour modifier"
+      title={styleHint ? 'Double-clic = style · triple-clic = modifier' : 'Double-cliquer pour modifier'}
+      onClick={handleTextClick}
       onDoubleClick={(e) => {
         stopBubble(e)
+        if (onStyleEdit && typographyRole) return
         setDraft(value)
         setEditing(true)
       }}
-      onClick={stopBubble}
       onMouseDown={stopBubble}
     >
       {value}

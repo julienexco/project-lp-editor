@@ -11,6 +11,7 @@ export const typographyRoleLabels: Record<TypographyRole, string> = {
 }
 
 export const blockTypographyRoles: Record<BlockType, TypographyRole[]> = {
+  navbar: ['body'],
   hero: ['eyebrow', 'h1', 'body', 'stat', 'caption'],
   featureGrid: ['h2', 'h3', 'eyebrow', 'body'],
   cta: ['h2', 'body'],
@@ -35,6 +36,9 @@ function role(
 }
 
 export const defaultTypographyByBlock: Record<BlockType, TypographyTheme> = {
+  navbar: {
+    body: role(14, 'medium'),
+  },
   hero: {
     eyebrow: role(12, 'medium'),
     h1: role(52, 'bold'),
@@ -83,6 +87,7 @@ export function migrateTypographyRoleStyle(
     sizePx,
     weight: raw.weight ?? fallback.weight,
     family: raw.family ?? fallback.family,
+    textColor: raw.textColor ?? fallback.textColor,
   }
 }
 

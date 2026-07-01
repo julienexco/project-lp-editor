@@ -302,8 +302,28 @@ export function ghostButtonClass(): string {
   ].join(' ')
 }
 
+export function navBarVisualClass(): string {
+  return 'border-b border-[#1A3066]/10 bg-white/90 shadow-sm shadow-[#1A3066]/5 backdrop-blur-md'
+}
+
+/** Header fixe en haut de la page (aperçu publié) */
+export function navBarFixedClass(): string {
+  return ['fixed inset-x-0 top-0 z-50 w-full', navBarVisualClass()].join(' ')
+}
+
+/** Header fixe au scroll dans le conteneur parent (éditeur) */
+export function navBarStickyClass(): string {
+  return ['sticky top-0 z-50 w-full', navBarVisualClass()].join(' ')
+}
+
+/** Réserve l'espace sous un header en position fixed */
+export function navBarSpacerClass(): string {
+  return 'pointer-events-none h-14 w-full shrink-0 @sm:h-[3.625rem]'
+}
+
+/** @deprecated use navBarStickyClass or navBarFixedClass */
 export function navBarClass(): string {
-  return 'sticky top-0 z-30 border-b border-[#1A3066]/10 bg-white/90 shadow-sm shadow-[#1A3066]/5 backdrop-blur-md'
+  return navBarStickyClass()
 }
 
 export function containerClass(): string {

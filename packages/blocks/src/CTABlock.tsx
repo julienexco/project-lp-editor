@@ -14,7 +14,7 @@ import {
 import { EditableText } from './EditableText'
 import { typoProps } from './typo'
 
-export function CTABlock({ content, style, editable, onEdit }: BlockProps<'cta'>) {
+export function CTABlock({ content, style, editable, onEdit, onStyleEdit }: BlockProps<'cta'>) {
   const centered = style.align === 'center'
   const onDark = isDarkBackground(style.color.bg)
   const typo = {
@@ -28,7 +28,7 @@ export function CTABlock({ content, style, editable, onEdit }: BlockProps<'cta'>
 
   const ctaButton = editable ? (
     <span className={accentButtonClass(onDark ? 'onDark' : 'default')}>
-      <EditableText value={content.buttonLabel} field="buttonLabel" editable={editable} onEdit={onEdit} as="span" />
+      <EditableText value={content.buttonLabel} field="buttonLabel" editable={editable} onEdit={onEdit} onStyleEdit={onStyleEdit} typographyRole="body" as="span" />
     </span>
   ) : (
     <a href={content.buttonHref} className={accentButtonClass(onDark ? 'onDark' : 'default')}>
@@ -52,6 +52,8 @@ export function CTABlock({ content, style, editable, onEdit }: BlockProps<'cta'>
             field="title"
             editable={editable}
             onEdit={onEdit}
+            onStyleEdit={onStyleEdit}
+            typographyRole="h2"
             className={t.h2.className}
             style={t.h2.style}
             as="h2"
@@ -61,6 +63,8 @@ export function CTABlock({ content, style, editable, onEdit }: BlockProps<'cta'>
             field="description"
             editable={editable}
             onEdit={onEdit}
+            onStyleEdit={onStyleEdit}
+            typographyRole="body"
             multiline
             className={`mt-4 ${t.body.className}`}
             style={t.body.style}

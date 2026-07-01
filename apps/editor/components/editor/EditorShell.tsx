@@ -5,9 +5,10 @@ import { BlockRenderer, applyContentField } from '@lp-studio/blocks'
 import { blockRegistry, normalizePageBlocks, resolveTypographyRole } from '@lp-studio/registry'
 import type { BlockInstance, BlockStyle, BlockType, ColorValue, PageRecord, TypographyRole, TypographyRoleStyle } from '@lp-studio/types'
 import { isPaletteToken, mergePageCustomColors, registerPageCustomColor, removePageCustomColor } from '@lp-studio/tokens'
+import { BlockContextEditor } from './BlockContextEditor'
 import { BlockList } from './BlockList'
 import { ContentFields } from './ContentFields'
-import { EditorSectionTitle } from './EditorSectionTitle'
+import { EditorCollapsibleSection } from './EditorCollapsibleSection'
 import { PREVIEW_VIEWPORTS, PreviewToolbar, detectDeviceViewport, loadSavedPreviewOverride, savePreviewViewport, type PreviewViewport } from './PreviewToolbar'
 import { StylePanel } from './StylePanel'
 import { TypographyPanel } from './TypographyPanel'
@@ -41,6 +42,9 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
   const [panelOpen, setPanelOpen] = useState(true)
   const [previewViewport, setPreviewViewport] = useState<PreviewViewport>('desktop')
   const [viewportOverride, setViewportOverride] = useState(false)
+  const [contextEditorOpen, setContextEditorOpen] = useState(false)
+  const [contextEditorBlockId, setContextEditorBlockId] = useState<string | null>(null)
+  const [contextEditorRole, setContextEditorRole] = useState<TypographyRole | null>(null)
   const [isNativeNarrow, setIsNativeNarrow] = useState(false)
 
   const blocksRef = useRef(page.blocks)
@@ -97,6 +101,17 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
     () => page.blocks.find((b) => b.id === selectedId) ?? null,
     [page.blocks, selectedId],
   )
+
+  const contextEditorBlock = useMemo(
+    () => (contextEditorBlockId ? page.blocks.find((b) => b.id === contextEditorBlockId) ?? null : null),
+    [page.blocks, contextEditorBlockId],
+  )
+
+  const closeContextEditor = useCallback(() => {
+    setContextEditorOpen(false)
+    setContextEditorBlockId(null)
+    setContextEditorRole(null)
+  }, [])
 
   const effectivePreviewWidth = isNativeNarrow ? '100%' : PREVIEW_VIEWPORTS[previewViewport].width
   const selectedBlockLabel = selectedBlock
@@ -202,37 +217,72 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
     [updateBlocks],
   )
 
+  const updateBlockStyle = useCallback(
+    (blockId: string, partial: Partial<BlockStyle>) => {
+      updateBlocks((blocks) =>
+        blocks.map((b) => (b.id === blockId ? { ...b, style: { ...b.style, ...partial } } : b)),
+      )
+    },
+    [updateBlocks],
+  )
+
   const updateTypography = (role: TypographyRole, partial: Partial<TypographyRoleStyle>) => {
     if (!selectedBlock) return
     const current = resolveTypographyRole(selectedBlock.type as BlockType, selectedBlock.style, role)
-    updateStyle({
+    const nextRole = { ...current, ...partial }
+    if ('textColor' in partial && partial.textColor === undefined) {
+      delete nextRole.textColor
+    }
+    updateBlockStyle(selectedBlock.id, {
       typography: {
         ...selectedBlock.style.typography,
-        [role]: { ...current, ...partial },
+        [role]: nextRole,
       },
     })
   }
 
-  const updateStyle = (partial: Partial<BlockStyle>) => {
-    if (!selectedBlock) return
+  const updateContextTypography = (role: TypographyRole, partial: Partial<TypographyRoleStyle>) => {
+    if (!contextEditorBlockId) return
     updateBlocks((blocks) =>
-      blocks.map((b) =>
-        b.id === selectedBlock.id ? { ...b, style: { ...b.style, ...partial } } : b,
-      ),
+      blocks.map((b) => {
+        if (b.id !== contextEditorBlockId) return b
+        const current = resolveTypographyRole(b.type as BlockType, b.style, role)
+        const nextRole = { ...current, ...partial }
+        if ('textColor' in partial && partial.textColor === undefined) {
+          delete nextRole.textColor
+        }
+        return {
+          ...b,
+          style: {
+            ...b.style,
+            typography: {
+              ...b.style.typography,
+              [role]: nextRole,
+            },
+          },
+        }
+      }),
     )
   }
 
-  const updateColor = (key: 'bg' | 'text', value: ColorValue) => {
+  const updateStyle = (partial: Partial<BlockStyle>) => {
     if (!selectedBlock) return
+    updateBlockStyle(selectedBlock.id, partial)
+  }
+
+  const updateContextStyle = (partial: Partial<BlockStyle>) => {
+    if (!contextEditorBlockId) return
+    updateBlockStyle(contextEditorBlockId, partial)
+  }
+
+  const applyBlockColor = (blockId: string, key: 'bg' | 'text', value: ColorValue) => {
     setPage((prev) => {
       const customColors = !isPaletteToken(value)
         ? registerPageCustomColor(prev.meta.customColors ?? [], value)
         : (prev.meta.customColors ?? [])
 
       const nextBlocks = prev.blocks.map((b) =>
-        b.id === selectedBlock.id
-          ? { ...b, style: { ...b.style, color: { ...b.style.color, [key]: value } } }
-          : b,
+        b.id === blockId ? { ...b, style: { ...b.style, color: { ...b.style.color, [key]: value } } } : b,
       )
 
       const next = {
@@ -245,6 +295,16 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
       return next
     })
     scheduleSave()
+  }
+
+  const updateColor = (key: 'bg' | 'text', value: ColorValue) => {
+    if (!selectedBlock) return
+    applyBlockColor(selectedBlock.id, key, value)
+  }
+
+  const updateContextColor = (key: 'bg' | 'text', value: ColorValue) => {
+    if (!contextEditorBlockId) return
+    applyBlockColor(contextEditorBlockId, key, value)
   }
 
   const removeCustomColor = (hex: string) => {
@@ -351,20 +411,21 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
               </button>
             </div>
 
-            <section className="border-b border-gray-200">
-              <EditorSectionTitle>Blocs</EditorSectionTitle>
+            <EditorCollapsibleSection title="Blocs" storageKey="blocs">
               <BlockList
                 blocks={page.blocks}
                 selectedId={selectedId}
-                onSelect={setSelectedId}
+                onSelect={(id) => {
+                  setSelectedId(id)
+                  closeContextEditor()
+                }}
                 registry={blockRegistry}
               />
-            </section>
+            </EditorCollapsibleSection>
 
             {selectedBlock ? (
               <>
-                <section className="border-b border-gray-200">
-                  <EditorSectionTitle>Contenu</EditorSectionTitle>
+                <EditorCollapsibleSection title="Contenu" storageKey="contenu">
                   <div className="px-4 py-4">
                     <ContentFields
                       block={selectedBlock}
@@ -372,10 +433,9 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
                       onChange={updateContent}
                     />
                   </div>
-                </section>
+                </EditorCollapsibleSection>
 
-                <section className="border-b border-gray-200">
-                  <EditorSectionTitle>Style</EditorSectionTitle>
+                <EditorCollapsibleSection title="Style" storageKey="style" defaultOpen={false}>
                   <StylePanel
                     style={selectedBlock.style}
                     customColors={page.meta.customColors ?? []}
@@ -384,16 +444,16 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
                     onRemoveCustomColor={removeCustomColor}
                     onMarginY={(marginY) => updateStyle({ spacing: { ...selectedBlock.style.spacing, marginY } })}
                   />
-                </section>
+                </EditorCollapsibleSection>
 
-                <section>
-                  <EditorSectionTitle>Typographie</EditorSectionTitle>
+                <EditorCollapsibleSection title="Typographie" storageKey="typographie" defaultOpen={false}>
                   <TypographyPanel
                     blockType={selectedBlock.type as BlockType}
                     style={selectedBlock.style}
+                    customColors={page.meta.customColors ?? []}
                     onRoleChange={updateTypography}
                   />
-                </section>
+                </EditorCollapsibleSection>
               </>
             ) : (
               <p className="p-4 text-sm text-gray-500">Sélectionnez un bloc pour éditer son contenu, son style et sa typographie.</p>
@@ -414,7 +474,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
           </button>
         ) : null}
 
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#eef2f6]">
+        <main className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#eef2f6]">
           <PreviewToolbar
             viewport={previewViewport}
             onViewportChange={handleViewportChange}
@@ -423,11 +483,11 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
             panelOpen={panelOpen}
             hideViewportSwitcher={isNativeNarrow}
           />
-          <div className={['flex-1 overflow-auto bg-[#dde3ea]', isNativeNarrow ? 'p-0' : 'p-3 sm:p-6'].join(' ')}>
+          <div className={['relative flex-1 overflow-auto bg-[#dde3ea]', isNativeNarrow ? 'p-0' : 'p-3 sm:p-6'].join(' ')}>
             <div
               className={[
                 'mx-auto min-h-full w-full bg-white transition-[width,max-width] duration-300 ease-out',
-                isNativeNarrow ? '' : 'overflow-hidden shadow-xl ring-1 ring-[#1A3066]/10',
+                isNativeNarrow ? '' : 'shadow-xl ring-1 ring-[#1A3066]/10',
               ].join(' ')}
               style={{
                 width: effectivePreviewWidth,
@@ -436,11 +496,38 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
             >
               <BlockRenderer
                 blocks={page.blocks}
-                selectedId={selectedId}
-                onSelect={setSelectedId}
+                selectedId={contextEditorOpen && contextEditorBlockId ? contextEditorBlockId : selectedId}
+                onSelect={(id) => {
+                  setSelectedId(id)
+                  closeContextEditor()
+                }}
+                onBlockDoubleClick={(id) => {
+                  setSelectedId(id)
+                  setContextEditorBlockId(id)
+                  setContextEditorRole(null)
+                  setContextEditorOpen(true)
+                }}
+                onTextStyleEdit={(id, _field, role) => {
+                  setSelectedId(id)
+                  setContextEditorBlockId(id)
+                  setContextEditorRole(role)
+                  setContextEditorOpen(true)
+                }}
                 onContentEdit={updateBlockContent}
               />
             </div>
+            {contextEditorOpen && contextEditorBlock ? (
+              <BlockContextEditor
+                block={contextEditorBlock}
+                customColors={page.meta.customColors ?? []}
+                initialRole={contextEditorRole}
+                onClose={closeContextEditor}
+                onTypographyChange={updateContextTypography}
+                onAlign={(align) => updateContextStyle({ align })}
+                onColor={updateContextColor}
+                onRemoveCustomColor={removeCustomColor}
+              />
+            ) : null}
           </div>
         </main>
       </div>
