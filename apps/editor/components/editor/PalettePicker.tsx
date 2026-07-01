@@ -13,6 +13,7 @@ import {
   resolveColorHex,
 } from '@lp-studio/tokens'
 import { ColorPickerPopover } from './ColorPickerPopover'
+import { editorPanel, type EditorPanelVariant } from './editor-panel-theme'
 
 type PalettePickerProps = {
   label: string
@@ -21,6 +22,7 @@ type PalettePickerProps = {
   customColors: readonly string[]
   onChange: (value: ColorValue) => void
   onRemoveCustom?: (hex: string) => void
+  variant?: EditorPanelVariant
 }
 
 const SWATCH =
@@ -41,7 +43,15 @@ function plusIconClass(hex: string | null): string {
   return relativeLuminance(hex) < 0.55 ? 'text-white' : 'text-[#1A3066]/70'
 }
 
-export function PalettePicker({ label, value, tokens, customColors, onChange, onRemoveCustom }: PalettePickerProps) {
+export function PalettePicker({
+  label,
+  value,
+  tokens,
+  customColors,
+  onChange,
+  onRemoveCustom,
+  variant = 'light',
+}: PalettePickerProps) {
   const customBtnRef = useRef<HTMLButtonElement>(null)
   const [pickerOpen, setPickerOpen] = useState(false)
   const displayHex = resolveColorHex(value)
@@ -61,7 +71,7 @@ export function PalettePicker({ label, value, tokens, customColors, onChange, on
 
   return (
     <div className="relative">
-      <p className="mb-3 text-sm font-medium text-[#1A3066]">{label}</p>
+      <p className={variant === 'dark' ? `mb-3 ${editorPanel.label}` : 'mb-3 text-sm font-medium text-[#1A3066]'}>{label}</p>
       <div className="flex flex-wrap items-center gap-3">
         {tokens.map((token) => {
           const active = isPaletteToken(value) && value === token
@@ -135,7 +145,9 @@ export function PalettePicker({ label, value, tokens, customColors, onChange, on
             'flex items-center justify-center',
             plusActive
               ? swatchActive(true)
-              : 'border-dashed border-[#1A3066]/30 bg-white hover:border-[#1A3066]/50',
+              : variant === 'dark'
+                ? 'border-dashed border-white/15 bg-[#242429] hover:border-white/25'
+                : 'border-dashed border-[#1A3066]/30 bg-white hover:border-[#1A3066]/50',
           ].join(' ')}
           style={plusShowsColor ? { backgroundColor: displayHex, borderStyle: 'solid' } : undefined}
         >
@@ -166,12 +178,16 @@ export function PalettePicker({ label, value, tokens, customColors, onChange, on
 type PalettePreviewProps = {
   bg: ColorValue
   text: ColorValue
+  variant?: EditorPanelVariant
 }
 
-export function PalettePreview({ bg, text }: PalettePreviewProps) {
+export function PalettePreview({ bg, text, variant = 'light' }: PalettePreviewProps) {
   return (
     <div
-      className="rounded-lg border border-[#1A3066]/10 px-4 py-3 text-sm font-medium shadow-sm"
+      className={[
+        'rounded-lg border px-4 py-3 text-sm font-medium shadow-sm',
+        variant === 'dark' ? 'border-zinc-600/50' : 'border-[#1A3066]/10',
+      ].join(' ')}
       style={{
         backgroundColor: resolveColorHex(bg),
         color: resolveColorHex(text),

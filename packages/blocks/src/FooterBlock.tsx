@@ -1,6 +1,6 @@
 import type { BlockProps } from '@lp-studio/types'
 import { resolveTypographyRole } from '@lp-studio/registry'
-import { containerClass, footerLinkClass, primaryTextClass, secondaryTextClass, sectionBorderClass, sectionColorStyle, sectionSpacing, sectionTheme } from '@lp-studio/tokens'
+import { containerClass, footerLayoutGridClass, footerLinkClass, primaryTextClass, secondaryTextClass, sectionBorderClass, sectionColorStyle, sectionSpacing, sectionTheme } from '@lp-studio/tokens'
 import { BrandLogo } from './BrandLogo'
 import { LinkIcon, MailIcon } from './decorations'
 import { EditableText } from './EditableText'
@@ -20,7 +20,7 @@ export function FooterBlock({ content, style, editable, onEdit, onStyleEdit }: B
     <footer className={[sectionTheme(style), sectionSpacing(style), 'relative border-t', sectionBorderClass(style)].join(' ')} style={sectionColorStyle(style)}>
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#E63946] via-[#E63946]/50 to-transparent" />
       <div className={containerClass()}>
-        <div className="grid gap-8 @sm:grid-cols-2 @lg:grid-cols-[1.5fr_1fr] @lg:items-center @lg:gap-12">
+        <div className={footerLayoutGridClass()}>
           <div className="space-y-4">
             {content.showLogo ? (
               <BrandLogo alt={content.brandName} variant="footer" />

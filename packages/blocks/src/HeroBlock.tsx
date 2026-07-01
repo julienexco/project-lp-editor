@@ -7,6 +7,9 @@ import {
   containerClass,
   highlightClass,
   heroBackgroundWashClass,
+  heroSplitLayoutClass,
+  heroStatGridCenteredClass,
+  heroStatGridSidebarClass,
   primaryTextClass,
   secondaryTextClass,
   sectionSpacing,
@@ -15,7 +18,7 @@ import {
   statCardClass,
 } from '@lp-studio/tokens'
 import { BrandLogo } from './BrandLogo'
-import { AccentBar, HeroGridPattern } from './decorations'
+import { AccentBar, CtaArrowIcon, HeroGridPattern } from './decorations'
 import { EditableText } from './EditableText'
 import { typoProps } from './typo'
 
@@ -43,6 +46,7 @@ export function HeroBlock({ content, style, editable, onEdit, onStyleEdit }: Blo
   ) : (
     <a href={content.ctaHref} className={accentButtonClass()}>
       {content.ctaLabel}
+      <CtaArrowIcon />
     </a>
   )
 
@@ -50,7 +54,7 @@ export function HeroBlock({ content, style, editable, onEdit, onStyleEdit }: Blo
     content.stats.map((stat, index) => (
       <div
         key={`stat-${index}`}
-        className={[statCardClass(), highlightFirst && index === 0 ? 'border-[#E63946]/20 bg-[#E3F2FD]/40' : ''].join(' ')}
+        className={[statCardClass(), highlightFirst && index === 0 ? 'border-[#E63946]/25 bg-gradient-to-br from-[#E3F2FD]/50 to-white' : ''].join(' ')}
       >
         <EditableText
           value={stat.value}
@@ -110,7 +114,7 @@ export function HeroBlock({ content, style, editable, onEdit, onStyleEdit }: Blo
       <div aria-hidden className={['pointer-events-none absolute inset-0', heroBackgroundWashClass(style)].join(' ')} />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-20 top-24 h-64 w-64 rounded-full bg-[#E63946]/[0.07] blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-16 h-72 w-72 -translate-x-1/2 rounded-full bg-[#E63946]/[0.06] blur-3xl"
       />
       <div
         aria-hidden
@@ -151,12 +155,10 @@ export function HeroBlock({ content, style, editable, onEdit, onStyleEdit }: Blo
                 as="p"
               />
               <div className="mt-8 flex w-full @sm:mt-10 @sm:w-auto">{ctaButton}</div>
-              <div className="mt-12 grid w-full max-w-3xl grid-cols-2 gap-3 @md:grid-cols-4 @sm:mt-14 @sm:gap-4">
-                {statCards(false)}
-              </div>
+              <div className={heroStatGridCenteredClass()}>{statCards(false)}</div>
             </div>
           ) : (
-            <div className="grid items-center gap-8 @lg:grid-cols-12 @lg:gap-14">
+            <div className={heroSplitLayoutClass()}>
               <div className="space-y-6 @sm:space-y-8 @lg:col-span-7">
                 <div className="flex flex-col gap-3">
                   <AccentBar />
@@ -190,7 +192,7 @@ export function HeroBlock({ content, style, editable, onEdit, onStyleEdit }: Blo
         <div className="mt-8 w-full @sm:mt-10 @sm:w-auto">{ctaButton}</div>
               </div>
               <div className="@lg:col-span-5">
-                <div className="grid grid-cols-2 gap-3 @sm:gap-4">{statCards(true)}</div>
+                <div className={heroStatGridSidebarClass()}>{statCards(true)}</div>
               </div>
             </div>
           )}

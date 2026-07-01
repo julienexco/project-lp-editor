@@ -1,5 +1,6 @@
 import type { BlockInstance, BlockType } from '@lp-studio/types'
 import type { blockRegistry } from '@lp-studio/registry'
+import { editorPanel } from './editor-panel-theme'
 
 type BlockListProps = {
   blocks: BlockInstance[]
@@ -22,10 +23,8 @@ export function BlockList({ blocks, selectedId, onSelect, registry }: BlockListP
               type="button"
               onClick={() => onSelect(block.id)}
               className={[
-                'w-full rounded-lg border px-3 py-2.5 text-left text-sm font-medium transition',
-                active
-                  ? 'border-[#E63946] bg-[#E3F2FD] text-[#1A3066] shadow-sm ring-1 ring-[#E63946]/30'
-                  : 'border-gray-200 text-[#1A3066]/80 hover:border-[#1A3066]/30 hover:bg-[#f8fafc]',
+                'w-full rounded-xl border px-3 py-2.5 text-left text-sm font-medium transition duration-150',
+                active ? editorPanel.blockActive : editorPanel.block,
               ].join(' ')}
             >
               {label}

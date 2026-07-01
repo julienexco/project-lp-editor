@@ -5,71 +5,88 @@
   "status": "draft",
   "blocks": [
     {
-      "id": "b-hero-001",
-      "type": "hero",
+      "id": "b-navbar-b-hero-001",
+      "type": "navbar",
       "order": 0,
       "content": {
-        "eyebrow": "Conseil · Upscaly Consulting",
-        "title": "Votre croissance stagne ?",
-        "titleHighlight": "On accélère.",
-        "subtitle": "Des systèmes d'acquisition qui tournent, pas des campagnes qui s'essoufflent. Audit gratuit pour repartir avec un plan clair.",
+        "brandAlt": "Upscaly Consulting — conseil en croissance B2B",
+        "ctaLabel": "Audit gratuit",
+        "ctaHref": "#contact",
+        "showLogo": true
+      },
+      "style": {
+        "align": "center",
+        "color": { "bg": "white", "text": "navy" },
+        "font": { "family": "poppins", "size": "sm", "weight": "medium" },
+        "spacing": { "marginY": "tight", "paddingX": "normal" },
+        "animation": "none"
+      }
+    },
+    {
+      "id": "b-hero-001",
+      "type": "hero",
+      "order": 1,
+      "content": {
+        "eyebrow": "Croissance · Acquisition · B2B",
+        "title": "Votre acquisition mérite",
+        "titleHighlight": "un système, pas un coup d'essai.",
+        "subtitle": "Nous aidons les dirigeants à structurer leur croissance : stratégie, exécution, automatisation. 45 minutes d'audit offert — vous repartez avec un plan clair, qu'on collabore ou non.",
         "ctaLabel": "Réserver mon audit gratuit",
         "ctaHref": "#contact",
-        "showLogo": true,
         "stats": [
-          { "value": "50+", "label": "clients accompagnés" },
-          { "value": "10 ans", "label": "sur le terrain" },
-          { "value": "3", "label": "leviers clés" },
-          { "value": "45 min", "label": "audit offert" }
+          { "value": "50+", "label": "entreprises accompagnées" },
+          { "value": "10 ans", "label": "d'expertise terrain" },
+          { "value": "×3", "label": "pipeline moyen visé" },
+          { "value": "45 min", "label": "audit sans engagement" }
         ]
       },
       "style": {
         "align": "center",
         "color": { "bg": "surface", "text": "navy" },
         "font": { "family": "poppins", "size": "xl", "weight": "bold" },
-        "spacing": { "marginY": "loose", "paddingX": "normal" },
-        "animation": "fade-in"
+        "spacing": { "marginY": "xl", "paddingX": "normal" },
+        "animation": "slide-up"
       }
     },
     {
       "id": "b-services-001",
       "type": "featureGrid",
-      "order": 1,
+      "order": 2,
       "content": {
-        "sectionTitle": "Trois façons de bosser ensemble",
+        "sectionTitle": "Trois façons d'accélérer votre croissance",
         "items": [
           {
             "title": "Coaching",
-            "tagline": "Pour le dirigeant qui exécute",
-            "description": "Tu exécutes, je structure la stratégie et les pièges à éviter. Sur mesure."
+            "tagline": "Vous pilotez, nous cartographions",
+            "description": "Sessions stratégiques sur mesure pour éviter les angles morts et prioriser ce qui génère du revenu. Idéal pour les fondateurs qui restent aux commandes."
           },
           {
             "title": "Accompagnement",
-            "tagline": "Pour l'équipe qui veut avancer vite",
-            "description": "On avance ensemble, semaine après semaine. Le meilleur ratio vitesse / autonomie."
+            "tagline": "Nous avançons main dans la main",
+            "description": "Rituels hebdomadaires, livrables concrets, votre équipe monte en compétence en même temps que les résultats. Le meilleur équilibre vitesse et autonomie."
           },
           {
             "title": "Pilotage",
-            "tagline": "Pour celui qui veut déléguer",
-            "description": "Je pilote la croissance de bout en bout. Stratégie, exécution, automatisation."
+            "tagline": "Nous prenons le relais",
+            "description": "De la stratégie d'acquisition à l'exécution opérationnelle : nous pilotons la croissance pendant que vous vous concentrez sur votre cœur de métier."
           }
         ]
       },
       "style": {
-        "align": "left",
+        "align": "center",
         "color": { "bg": "white", "text": "navy" },
         "font": { "family": "poppins", "size": "md", "weight": "normal" },
-        "spacing": { "marginY": "normal", "paddingX": "normal" },
-        "animation": "none"
+        "spacing": { "marginY": "loose", "paddingX": "normal" },
+        "animation": "fade-in"
       }
     },
     {
       "id": "b-cta-001",
       "type": "cta",
-      "order": 2,
+      "order": 3,
       "content": {
-        "title": "45 minutes pour y voir clair.",
-        "description": "On scanne votre situation, on identifie ce qui bloque, vous repartez avec un plan d'action — même si on ne travaille pas ensemble.",
+        "title": "45 minutes pour transformer l'incertitude en plan d'action.",
+        "description": "En un appel, nous analysons votre acquisition actuelle, identifions les 3 leviers à activer en priorité et vous donnons une feuille de route actionnable — sans engagement de votre part.",
         "buttonLabel": "Réserver mon audit gratuit",
         "buttonHref": "#contact"
       },
@@ -78,19 +95,19 @@
         "color": { "bg": "navy", "text": "white" },
         "font": { "family": "poppins", "size": "lg", "weight": "bold" },
         "spacing": { "marginY": "loose", "paddingX": "normal" },
-        "animation": "none"
+        "animation": "fade-in"
       }
     },
     {
       "id": "b-footer-001",
       "type": "footer",
-      "order": 3,
+      "order": 4,
       "content": {
         "brandName": "Upscaly Consulting",
         "email": "contact@upscaly.com",
         "linkedinUrl": "https://linkedin.com",
         "linkedinLabel": "LinkedIn",
-        "copyright": "© 2026 Upscaly Consulting",
+        "copyright": "© 2026 Upscaly Consulting — Conseil en croissance B2B",
         "showLogo": true
       },
       "style": {

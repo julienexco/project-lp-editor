@@ -29,6 +29,25 @@ Les modifications sont persistées dans `apps/editor/data/local-page.json`.
 npm run validate
 ```
 
+Vérifie les blocs (pas de texte en dur, grilles mobile-first conformes à `docs/responsive.md`).
+
+## Workflow création landing
+
+Brief → inspiration (3 galeries) → version initiale → ajustements dans l'éditeur.  
+Doc workspace : [`../docs/LANDING-WORKFLOW.md`](../docs/LANDING-WORKFLOW.md)
+
+**Règle agent** : modifier la landing (`local-page.json`, blocs, tokens) — pas l'éditeur ni le toolkit rapide sauf demande explicite.
+
+## Responsive (défaut projet)
+
+Convention par défaut : **mobile = une colonne, pleine largeur**. Détail dans [`docs/responsive.md`](docs/responsive.md).  
+Convention workspace : [`../docs/RESPONSIVE.md`](../docs/RESPONSIVE.md).
+
+## Inspiration design
+
+Références workspace : **[One Page Love](https://onepagelove.com/)** · **[Lapa Ninja](https://www.lapa.ninja/)** · **[Landingfolio](https://www.landingfolio.com/)**  
+[`../docs/DESIGN-INSPIRATION.md`](../docs/DESIGN-INSPIRATION.md) · Charte : [`docs/brand/identity.md`](docs/brand/identity.md)
+
 ## Structure
 
 - `packages/blocks` — Hero, Services, CTA, Footer

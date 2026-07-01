@@ -1,14 +1,21 @@
 import type { BlockInstance, BlockType } from '@lp-studio/types'
 import type { BlockDefinition } from '@lp-studio/registry'
+import { editorPanel, type EditorPanelVariant } from './editor-panel-theme'
 
 type ContentFieldsProps = {
   block: BlockInstance
   schema: BlockDefinition['contentSchema']
   onChange: (field: string, value: unknown) => void
+  variant?: EditorPanelVariant
 }
 
-export function ContentFields({ block, schema, onChange }: ContentFieldsProps) {
+export function ContentFields({ block, schema, onChange, variant = 'dark' }: ContentFieldsProps) {
   const content = block.content as Record<string, unknown>
+  const labelClass = variant === 'dark' ? editorPanel.label : 'mb-1 block font-medium text-[#1A3066]'
+  const inputClass = variant === 'dark' ? editorPanel.input : 'w-full rounded border px-2 py-1'
+  const cardClass =
+    variant === 'dark' ? editorPanel.card : 'space-y-1 rounded border p-2'
+  const checkboxClass = variant === 'dark' ? 'text-sm text-zinc-300' : 'flex items-center gap-2 text-sm'
 
   return (
     <div className="space-y-3">
@@ -17,11 +24,11 @@ export function ContentFields({ block, schema, onChange }: ContentFieldsProps) {
           const stats = (content.stats as { value: string; label: string }[]) ?? []
           return (
             <div key={key} className="space-y-2">
-              <p className="text-sm font-medium text-[#1A3066]">{field.label}</p>
+              <p className={variant === 'dark' ? editorPanel.label : 'text-sm font-medium text-[#1A3066]'}>{field.label}</p>
               {stats.map((stat, i) => (
                 <div key={stat.label} className="grid grid-cols-2 gap-2">
                   <input
-                    className="rounded border px-2 py-1 text-sm"
+                    className={inputClass}
                     value={stat.value}
                     onChange={(e) => {
                       const next = [...stats]
@@ -31,7 +38,7 @@ export function ContentFields({ block, schema, onChange }: ContentFieldsProps) {
                     placeholder="Valeur"
                   />
                   <input
-                    className="rounded border px-2 py-1 text-sm"
+                    className={inputClass}
                     value={stat.label}
                     onChange={(e) => {
                       const next = [...stats]
@@ -50,11 +57,11 @@ export function ContentFields({ block, schema, onChange }: ContentFieldsProps) {
           const items = (content.items as { title: string; tagline: string; description: string }[]) ?? []
           return (
             <div key={key} className="space-y-3">
-              <p className="text-sm font-medium text-[#1A3066]">{field.label}</p>
+              <p className={variant === 'dark' ? editorPanel.label : 'text-sm font-medium text-[#1A3066]'}>{field.label}</p>
               {items.map((item, i) => (
-                <div key={item.title} className="space-y-1 rounded border p-2">
+                <div key={item.title} className={cardClass}>
                   <input
-                    className="w-full rounded border px-2 py-1 text-sm font-semibold"
+                    className={`${inputClass} font-semibold`}
                     value={item.title}
                     onChange={(e) => {
                       const next = [...items]
@@ -63,7 +70,7 @@ export function ContentFields({ block, schema, onChange }: ContentFieldsProps) {
                     }}
                   />
                   <input
-                    className="w-full rounded border px-2 py-1 text-xs"
+                    className={`${inputClass} text-xs`}
                     value={item.tagline}
                     onChange={(e) => {
                       const next = [...items]
@@ -72,7 +79,7 @@ export function ContentFields({ block, schema, onChange }: ContentFieldsProps) {
                     }}
                   />
                   <textarea
-                    className="w-full rounded border px-2 py-1 text-sm"
+                    className={inputClass}
                     rows={2}
                     value={item.description}
                     onChange={(e) => {
@@ -89,11 +96,12 @@ export function ContentFields({ block, schema, onChange }: ContentFieldsProps) {
 
         if (field.type === 'boolean') {
           return (
-            <label key={key} className="flex items-center gap-2 text-sm">
+            <label key={key} className={`flex items-center gap-2 ${checkboxClass}`}>
               <input
                 type="checkbox"
                 checked={Boolean(content[key])}
                 onChange={(e) => onChange(key, e.target.checked)}
+                className="accent-[#E63946]"
               />
               {field.label}
             </label>
@@ -103,17 +111,17 @@ export function ContentFields({ block, schema, onChange }: ContentFieldsProps) {
         const isLong = key === 'subtitle' || key === 'description'
         return (
           <label key={key} className="block text-sm">
-            <span className="mb-1 block font-medium text-[#1A3066]">{field.label}</span>
+            <span className={labelClass}>{field.label}</span>
             {isLong ? (
               <textarea
-                className="w-full rounded border px-2 py-1"
+                className={inputClass}
                 rows={3}
                 value={String(content[key] ?? '')}
                 onChange={(e) => onChange(key, e.target.value)}
               />
             ) : (
               <input
-                className="w-full rounded border px-2 py-1"
+                className={inputClass}
                 value={String(content[key] ?? '')}
                 onChange={(e) => onChange(key, e.target.value)}
               />

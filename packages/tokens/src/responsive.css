@@ -1,0 +1,11 @@
+/**
+ * LP Studio — breakpoints container (mobile-first)
+ * Preview mobile : 390px → une seule colonne, pleine largeur.
+ * Multi-colonnes à partir de tablette (≥ 768px container).
+ * Doc : docs/responsive.md
+ */
+@theme {
+  --breakpoint-sm: 30rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+}

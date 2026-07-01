@@ -2,6 +2,7 @@
 
 import type { ColorValue, PaletteToken } from '@lp-studio/types'
 import { brandColors, isPaletteToken, normalizeHex, textPaletteTokens } from '@lp-studio/tokens'
+import { editorPanel, type EditorPanelVariant } from './editor-panel-theme'
 
 type CompactColorPickerProps = {
   label: string
@@ -9,10 +10,19 @@ type CompactColorPickerProps = {
   inheritLabel: string
   customColors: readonly string[]
   onChange: (value: ColorValue | undefined) => void
+  variant?: EditorPanelVariant
 }
 
-export function CompactColorPicker({ label, value, inheritLabel, customColors, onChange }: CompactColorPickerProps) {
+export function CompactColorPicker({
+  label,
+  value,
+  inheritLabel,
+  customColors,
+  onChange,
+  variant = 'light',
+}: CompactColorPickerProps) {
   const inherits = value === undefined
+  const mutedClass = variant === 'dark' ? editorPanel.labelMuted : 'text-[#5C6B8A]'
 
   const swatch = (color: ColorValue, key: string) => {
     const hex = isPaletteToken(color) ? brandColors[color] : normalizeHex(color)
@@ -36,13 +46,19 @@ export function CompactColorPicker({ label, value, inheritLabel, customColors, o
   return (
     <div>
       <div className="mb-1.5 flex items-center justify-between gap-2">
-        <span className="text-xs text-[#5C6B8A]">{label}</span>
+        <span className={`text-xs ${mutedClass}`}>{label}</span>
         <button
           type="button"
           onClick={() => onChange(undefined)}
           className={[
             'rounded px-2 py-0.5 text-[10px] font-medium transition',
-            inherits ? 'bg-[#E3F2FD] text-[#1A3066]' : 'text-[#5C6B8A] hover:bg-gray-100',
+            inherits
+              ? variant === 'dark'
+                ? 'bg-[#E63946]/20 text-white'
+                : 'bg-[#E3F2FD] text-[#1A3066]'
+              : variant === 'dark'
+                ? 'text-zinc-500 hover:bg-white/10 hover:text-zinc-300'
+                : 'text-[#5C6B8A] hover:bg-gray-100',
           ].join(' ')}
         >
           {inheritLabel}

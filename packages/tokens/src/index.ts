@@ -274,22 +274,33 @@ export function mutedClass(): string {
 
 export function accentButtonClass(variant: 'default' | 'onDark' = 'default'): string {
   const base = [
-    'inline-flex w-full min-h-11 items-center justify-center rounded-full px-6 py-3.5 @sm:w-auto @sm:min-h-12 @sm:px-8 @sm:py-4',
+    'group inline-flex w-full min-h-11 items-center justify-center gap-2 rounded-full px-7 py-3.5 @sm:w-auto @sm:min-h-12 @sm:px-9 @sm:py-4',
     'text-sm @sm:text-base font-semibold shadow-lg transition duration-200',
-    'hover:translate-y-[-1px] hover:shadow-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
+    'hover:translate-y-[-2px] hover:shadow-xl active:translate-y-0',
+    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
     'cursor-pointer',
   ]
 
   if (variant === 'onDark') {
     return [
       ...base,
-      'bg-[#E63946] text-white shadow-[#E63946]/30 hover:brightness-105 focus-visible:outline-white',
+      'bg-[#E63946] text-white shadow-[#E63946]/35 hover:brightness-110 focus-visible:outline-white',
     ].join(' ')
   }
 
   return [
     ...base,
-    'bg-[#E63946] text-white shadow-[#E63946]/25 hover:brightness-105 focus-visible:outline-[#1A3066]',
+    'bg-[#E63946] text-white shadow-[#E63946]/30 hover:brightness-110 focus-visible:outline-[#1A3066]',
+  ].join(' ')
+}
+
+export function navCtaButtonClass(): string {
+  return [
+    'inline-flex min-h-10 items-center justify-center rounded-full px-5 py-2',
+    'text-xs font-semibold text-white transition duration-200 @sm:min-h-11 @sm:px-6 @sm:py-2.5 @sm:text-sm',
+    'bg-[#E63946] shadow-md shadow-[#E63946]/25 hover:brightness-110 hover:shadow-lg',
+    'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1A3066]',
+    'cursor-pointer',
   ].join(' ')
 }
 
@@ -303,7 +314,7 @@ export function ghostButtonClass(): string {
 }
 
 export function navBarVisualClass(): string {
-  return 'border-b border-[#1A3066]/10 bg-white/90 shadow-sm shadow-[#1A3066]/5 backdrop-blur-md'
+  return 'border-b border-[#1A3066]/8 bg-white/95 shadow-[0_1px_24px_-4px_rgba(26,48,102,0.08)] backdrop-blur-lg'
 }
 
 /** Header fixe en haut de la page (aperçu publié) */
@@ -326,8 +337,50 @@ export function navBarClass(): string {
   return navBarStickyClass()
 }
 
+export const RESPONSIVE_BREAKPOINTS = {
+  /** 480px — typo / spacing, pas les grilles multi-colonnes */
+  sm: '30rem',
+  /** 768px — 2 colonnes */
+  md: '48rem',
+  /** 1024px — 3+ colonnes */
+  lg: '64rem',
+} as const
+
+/** Largeur preview mobile éditeur — en dessous : layout empilé */
+export const MOBILE_PREVIEW_WIDTH_PX = 390
+
 export function containerClass(): string {
   return 'mx-auto w-full max-w-6xl'
+}
+
+/** Grille services : 1 col mobile, 2 cols tablette, 3 cols desktop */
+export function serviceGridClass(): string {
+  return 'grid w-full grid-cols-1 gap-5 @md:grid-cols-2 @md:gap-6 @lg:grid-cols-3'
+}
+
+/** Grille stats hero (centré) : empilé mobile → 2 cols tablette → 4 cols desktop */
+export function heroStatGridCenteredClass(): string {
+  return 'mt-12 grid w-full max-w-3xl grid-cols-1 gap-3 @md:mt-14 @md:grid-cols-2 @md:gap-4 @lg:grid-cols-4'
+}
+
+/** Grille stats hero (sidebar) : empilé mobile → 2 cols dès tablette */
+export function heroStatGridSidebarClass(): string {
+  return 'grid w-full grid-cols-1 gap-3 @md:grid-cols-2 @md:gap-4'
+}
+
+/** Layout hero deux zones : empilé mobile, côte à côte desktop */
+export function heroSplitLayoutClass(): string {
+  return 'grid w-full grid-cols-1 items-center gap-8 @lg:grid-cols-12 @lg:gap-14'
+}
+
+/** Footer : empilé mobile, 2 cols tablette */
+export function footerLayoutGridClass(): string {
+  return 'grid w-full grid-cols-1 gap-8 @md:grid-cols-2 @lg:grid-cols-[1.5fr_1fr] @lg:items-center @lg:gap-12'
+}
+
+/** Carte pleine largeur sur mobile */
+export function fullWidthOnMobileClass(): string {
+  return 'w-full min-w-0'
 }
 
 export function contentAlignClass(align: AlignToken): string {
@@ -341,32 +394,35 @@ export function contentAlignClass(align: AlignToken): string {
 
 export function statCardClass(): string {
   return [
-    'rounded-2xl border border-[#1A3066]/10 bg-white p-4 shadow-sm @sm:p-5',
-    'transition duration-200 hover:border-[#1A3066]/15 hover:shadow-md',
+    'rounded-2xl border border-[#1A3066]/8 bg-white/90 p-4 backdrop-blur-sm @sm:p-5',
+    'shadow-[0_4px_24px_-8px_rgba(26,48,102,0.12)]',
+    'transition duration-200 hover:-translate-y-0.5 hover:border-[#1A3066]/15 hover:shadow-md',
   ].join(' ')
 }
 
 export function serviceCardClass(): string {
   return [
-    'flex h-full flex-col rounded-2xl border border-[#1A3066]/10 bg-white p-5 @sm:p-7',
-    'shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-[#1A3066]/15 hover:shadow-md',
+    'relative flex h-full flex-col rounded-2xl border border-[#1A3066]/8 bg-white p-5 @sm:p-7',
+    'shadow-[0_4px_24px_-10px_rgba(26,48,102,0.1)]',
+    'transition duration-200 hover:-translate-y-1 hover:border-[#1A3066]/15 hover:shadow-lg',
   ].join(' ')
 }
 
 export function featuredServiceCardClass(): string {
   return [
-    'relative flex h-full flex-col overflow-hidden rounded-2xl border border-[#E63946]/25 bg-white p-5 @sm:p-7',
-    'shadow-lg shadow-[#1A3066]/10 ring-1 ring-[#E63946]/10',
-    'transition duration-200 hover:-translate-y-1 hover:shadow-xl',
+    'relative flex h-full flex-col overflow-hidden rounded-2xl border border-[#E63946]/20 bg-white p-5 @sm:p-7',
+    'shadow-[0_8px_32px_-8px_rgba(26,48,102,0.15)] ring-1 ring-[#E63946]/10',
+    'transition duration-200 hover:-translate-y-1.5 hover:shadow-xl',
+    'before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-1 before:bg-gradient-to-r before:from-[#E63946] before:via-[#E63946]/70 before:to-[#1A3066]/30',
   ].join(' ')
 }
 
 export function ctaPanelClass(onDark: boolean): string {
   return [
-    'rounded-2xl border px-5 py-8 @sm:rounded-3xl @sm:px-10 @sm:py-14 @lg:px-16',
+    'rounded-2xl border px-6 py-10 @sm:rounded-3xl @sm:px-12 @sm:py-16 @lg:px-20',
     onDark
-      ? 'border-white/10 bg-white/[0.04] backdrop-blur-sm'
-      : 'border-[#1A3066]/10 bg-white shadow-xl shadow-[#1A3066]/10',
+      ? 'border-white/12 bg-gradient-to-br from-white/[0.06] to-white/[0.02] backdrop-blur-sm'
+      : 'border-[#1A3066]/10 bg-white shadow-2xl shadow-[#1A3066]/12',
   ].join(' ')
 }
 
@@ -393,7 +449,7 @@ export function heroBackgroundWashClass(style: BlockStyle): string {
   if (isWhiteishBackground(style.color.bg)) {
     return 'bg-gradient-to-b from-white via-white/95 to-[#f8fafc]'
   }
-  return 'bg-gradient-to-b from-[#E3F2FD] via-white/95 to-white'
+  return 'bg-gradient-to-b from-[#E3F2FD] via-[#f0f7fd] to-white'
 }
 
 /** Bordure de section adaptée au fond */

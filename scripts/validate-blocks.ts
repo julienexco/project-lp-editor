@@ -17,10 +17,36 @@ function hasJsxTextChild(sourceFile: ts.SourceFile, node: ts.Node): boolean {
   return ts.forEachChild(node, (child) => hasJsxTextChild(sourceFile, child))
 }
 
+function checkResponsiveClassNames(source: string, filePath: string): string[] {
+  const errors: string[] = []
+  const classPattern = /className\s*=\s*(?:\{)?[`'"]([^`'"]+)[`'"]/g
+  const multiCol = /\bgrid-cols-(?:[2-9]|1[0-2])\b/
+  const smGrid = /@sm:grid-cols-/
+
+  let match: RegExpExecArray | null
+  while ((match = classPattern.exec(source)) !== null) {
+    const cls = match[1]
+    if (multiCol.test(cls) && !/\bgrid-cols-1\b/.test(cls)) {
+      const line = source.slice(0, match.index).split('\n').length
+      errors.push(
+        `${filePath}:${line} — grille multi-colonnes sans grid-cols-1 (mobile-first) — utiliser un helper @lp-studio/tokens (voir docs/responsive.md)`,
+      )
+    }
+    if (smGrid.test(cls)) {
+      const line = source.slice(0, match.index).split('\n').length
+      errors.push(
+        `${filePath}:${line} — @sm:grid-cols-* interdit — multi-colonnes dès @md (voir docs/responsive.md)`,
+      )
+    }
+  }
+
+  return errors
+}
+
 function checkFile(filePath: string): string[] {
   const source = readFileSync(filePath, 'utf-8')
   const sourceFile = ts.createSourceFile(filePath, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
-  const errors: string[] = []
+  const errors: string[] = [...checkResponsiveClassNames(source, filePath)]
 
   function visit(node: ts.Node) {
     if (ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)) {

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
+import { editorPanel } from './editor-panel-theme'
 
 const SECTION_STORAGE_PREFIX = 'lp-studio-section-open:'
 
@@ -38,22 +39,19 @@ export function EditorCollapsibleSection({
   }
 
   return (
-    <section className="border-b border-gray-200">
+    <section className={editorPanel.section}>
       <button
         type="button"
         onClick={toggle}
-        className="flex w-full items-center justify-between gap-3 border-b border-[#1A3066]/10 bg-[#E3F2FD]/40 px-4 py-3 text-left transition hover:bg-[#E3F2FD]/70"
+        className={editorPanel.sectionButton}
         aria-expanded={open}
       >
-        <h2 className="text-sm font-bold uppercase tracking-[0.14em] text-[#1A3066]">{title}</h2>
-        <span
-          className="flex h-6 w-6 shrink-0 items-center justify-center rounded border border-[#1A3066]/20 bg-white text-base font-bold leading-none text-[#1A3066]"
-          aria-hidden
-        >
+        <h2 className={editorPanel.sectionTitle}>{title}</h2>
+        <span className={editorPanel.sectionToggle} aria-hidden>
           {open ? '−' : '+'}
         </span>
       </button>
-      {open ? children : null}
+      {open ? <div className={editorPanel.sectionBody}>{children}</div> : null}
     </section>
   )
 }

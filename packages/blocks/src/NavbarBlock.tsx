@@ -1,27 +1,22 @@
 import type { BlockProps } from '@lp-studio/types'
-import { resolveTypographyRole } from '@lp-studio/registry'
 import {
   containerClass,
-  ghostButtonClass,
   navBarFixedClass,
   navBarSpacerClass,
   navBarStickyClass,
-  primaryTextClass,
+  navCtaButtonClass,
   sectionColorStyle,
 } from '@lp-studio/tokens'
 import { BrandLogo } from './BrandLogo'
 import { EditableText } from './EditableText'
-import { typoProps } from './typo'
 
 export function NavbarBlock({ content, style, editable, onEdit, onStyleEdit }: BlockProps<'navbar'>) {
   if (!content.showLogo) return null
 
-  const typo = resolveTypographyRole('navbar', style, 'body')
-  const t = typoProps(typo, 'body', primaryTextClass(style))
   const shellClass = editable ? navBarStickyClass() : navBarFixedClass()
 
   const navCta = editable ? (
-    <span className={ghostButtonClass()}>
+    <span className={navCtaButtonClass()}>
       <EditableText
         value={content.ctaLabel}
         field="ctaLabel"
@@ -29,13 +24,12 @@ export function NavbarBlock({ content, style, editable, onEdit, onStyleEdit }: B
         onEdit={onEdit}
         onStyleEdit={onStyleEdit}
         typographyRole="body"
-        className={t.className}
-        style={t.style}
+        className="text-white"
         as="span"
       />
     </span>
   ) : (
-    <a href={content.ctaHref} className={ghostButtonClass()}>
+    <a href={content.ctaHref} className={navCtaButtonClass()}>
       {content.ctaLabel}
     </a>
   )

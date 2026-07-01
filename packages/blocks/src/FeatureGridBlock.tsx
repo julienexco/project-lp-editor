@@ -5,15 +5,18 @@ import {
   cardSecondaryTextClass,
   containerClass,
   featuredServiceCardClass,
+  footerLayoutGridClass,
+  fullWidthOnMobileClass,
   primaryTextClass,
   secondaryTextClass,
   sectionSpacing,
   sectionColorStyle,
   sectionTheme,
   serviceCardClass,
+  serviceGridClass,
   paletteTextClass,
 } from '@lp-studio/tokens'
-import { AccentBar } from './decorations'
+import { AccentBar, ServiceIcon } from './decorations'
 import { EditableText } from './EditableText'
 import { typoProps } from './typo'
 
@@ -32,6 +35,8 @@ export function FeatureGridBlock({ content, style, editable, onEdit, onStyleEdit
     eyebrow: typoProps(typo.eyebrow, 'eyebrow', cardSecondaryTextClass()),
     body: typoProps(typo.body, 'body', cardSecondaryTextClass()),
   }
+
+  const serviceIcons = ['coaching', 'team', 'pilot'] as const
 
   return (
     <section className={[sectionTheme(style), sectionSpacing(style), 'relative'].join(' ')} style={sectionColorStyle(style)}>
@@ -57,21 +62,21 @@ export function FeatureGridBlock({ content, style, editable, onEdit, onStyleEdit
           />
         </div>
 
-        <div className="grid gap-5 @sm:grid-cols-2 @sm:gap-6 @lg:grid-cols-3">
+        <div className={serviceGridClass()}>
           {content.items.map((item, index) => (
             <article
               key={`item-${index}`}
-              className={index === featuredIndex ? featuredServiceCardClass() : serviceCardClass()}
+              className={[index === featuredIndex ? featuredServiceCardClass() : serviceCardClass(), fullWidthOnMobileClass()].join(' ')}
             >
               <span
                 className={[
-                  'inline-flex h-10 w-10 items-center justify-center rounded-xl text-xs font-bold',
+                  'inline-flex h-11 w-11 items-center justify-center rounded-xl',
                   index === featuredIndex
-                    ? 'bg-[#E63946] text-white shadow-md shadow-[#E63946]/25'
+                    ? 'bg-[#E63946] text-white shadow-lg shadow-[#E63946]/30'
                     : `bg-[#E3F2FD] ${paletteTextClass('navy')}`,
                 ].join(' ')}
               >
-                {String(index + 1).padStart(2, '0')}
+                <ServiceIcon variant={serviceIcons[index] ?? 'coaching'} />
               </span>
               <EditableText
                 value={item.title}

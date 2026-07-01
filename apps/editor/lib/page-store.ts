@@ -77,6 +77,7 @@ export async function getPage(id: string): Promise<PageRecord | null> {
 export type PagePatch = {
   blocks?: BlockInstance[]
   meta?: PageMeta
+  name?: string
 }
 
 export async function updatePage(id: string, patch: PagePatch): Promise<PageRecord> {
@@ -92,12 +93,13 @@ export async function updatePage(id: string, patch: PagePatch): Promise<PageReco
   }
 
   const updatedAt = new Date().toISOString()
+  const nextName = patch.name?.trim() || current.name
   const supabase = getSupabaseAdmin()
 
   if (supabase) {
     const { data, error } = await supabase
       .from('pages')
-      .update({ blocks: normalizedBlocks, meta, updated_at: updatedAt })
+      .update({ blocks: normalizedBlocks, meta, name: nextName, updated_at: updatedAt })
       .eq('id', id)
       .select('*')
       .single()
@@ -110,6 +112,7 @@ export async function updatePage(id: string, patch: PagePatch): Promise<PageReco
     ...current,
     blocks: normalizedBlocks,
     meta,
+    name: nextName,
     updated_at: updatedAt,
   }
   writeLocalPage(next)

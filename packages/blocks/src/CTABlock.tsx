@@ -11,6 +11,7 @@ import {
   sectionColorStyle,
   sectionTheme,
 } from '@lp-studio/tokens'
+import { CtaArrowIcon } from './decorations'
 import { EditableText } from './EditableText'
 import { typoProps } from './typo'
 
@@ -22,7 +23,7 @@ export function CTABlock({ content, style, editable, onEdit, onStyleEdit }: Bloc
     body: resolveTypographyRole('cta', style, 'body'),
   }
   const t = {
-    h2: typoProps(typo.h2, 'h2', 'max-w-2xl', primaryTextClass(style), centered ? 'mx-auto' : ''),
+    h2: typoProps(typo.h2, 'h2', 'max-w-3xl', primaryTextClass(style), centered ? 'mx-auto' : ''),
     body: typoProps(typo.body, 'body', 'max-w-2xl @sm:mt-5', secondaryTextClass(style), centered ? 'mx-auto' : ''),
   }
 
@@ -33,16 +34,23 @@ export function CTABlock({ content, style, editable, onEdit, onStyleEdit }: Bloc
   ) : (
     <a href={content.buttonHref} className={accentButtonClass(onDark ? 'onDark' : 'default')}>
       {content.buttonLabel}
+      <CtaArrowIcon />
     </a>
   )
 
   return (
     <section id="contact" className={[sectionTheme(style), sectionSpacing(style), 'relative overflow-hidden'].join(' ')} style={sectionColorStyle(style)}>
       {onDark ? (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -right-16 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-[#E63946]/15 blur-3xl"
-        />
+        <>
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-20 top-1/2 h-80 w-80 -translate-y-1/2 rounded-full bg-[#E63946]/20 blur-3xl"
+          />
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -left-24 bottom-0 h-64 w-64 rounded-full bg-white/[0.04] blur-3xl"
+          />
+        </>
       ) : null}
 
       <div className={`${containerClass()} relative z-10`}>

@@ -70,14 +70,22 @@ export function PreviewToolbar({
           </button>
         ) : null}
         {selectedBlockLabel ? (
-          <p className="truncate text-xs font-medium text-[#1A3066] sm:hidden">{selectedBlockLabel}</p>
+          <>
+            <span className="inline-flex max-w-full rounded-lg border border-[#1A3066]/10 bg-[#f8fafc] p-0.5 sm:hidden">
+              <span className="truncate rounded-md bg-white px-2 py-1 text-xs font-medium text-[#1A3066] shadow-sm">
+                {selectedBlockLabel}
+              </span>
+            </span>
+            <span className="hidden max-w-full rounded-lg border border-[#1A3066]/10 bg-[#f8fafc] p-0.5 sm:inline-flex">
+              <span className="truncate rounded-md bg-white px-2 py-1 text-xs font-medium text-[#1A3066] shadow-sm">
+                Bloc actuel : {selectedBlockLabel}
+              </span>
+            </span>
+          </>
         ) : null}
       </div>
 
       <div className="flex items-center gap-2">
-        {selectedBlockLabel ? (
-          <p className="hidden truncate text-xs font-medium text-[#1A3066] sm:block">Bloc : {selectedBlockLabel}</p>
-        ) : null}
         {hideViewportSwitcher ? (
           <p className="text-xs font-medium text-[#1A3066]">Aperçu {PREVIEW_VIEWPORTS[viewport].label.toLowerCase()}</p>
         ) : (

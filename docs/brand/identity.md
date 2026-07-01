@@ -26,5 +26,6 @@
 ## Règles
 
 - Structure inspirée de growthconsult.net, rendu visuel Upscaly (fond clair)
+- **Inspiration design** : [One Page Love](https://onepagelove.com/) + [Lapa Ninja](https://www.lapa.ninja/) + [Landingfolio](https://www.landingfolio.com/) — voir `../../docs/DESIGN-INSPIRATION.md` · Workflow : `../../docs/LANDING-WORKFLOW.md`
 - CTA accent sur fond `navy` ou `white` uniquement
 - Pas de couleurs hors palette dans le panel

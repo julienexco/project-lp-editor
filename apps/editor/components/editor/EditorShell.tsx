@@ -9,6 +9,8 @@ import { BlockContextEditor } from './BlockContextEditor'
 import { BlockList } from './BlockList'
 import { ContentFields } from './ContentFields'
 import { EditorCollapsibleSection } from './EditorCollapsibleSection'
+import { EditablePageTitle } from './EditablePageTitle'
+import { editorPanel } from './editor-panel-theme'
 import { PREVIEW_VIEWPORTS, PreviewToolbar, detectDeviceViewport, loadSavedPreviewOverride, savePreviewViewport, type PreviewViewport } from './PreviewToolbar'
 import { StylePanel } from './StylePanel'
 import { TypographyPanel } from './TypographyPanel'
@@ -49,6 +51,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
 
   const blocksRef = useRef(page.blocks)
   const metaRef = useRef(page.meta)
+  const nameRef = useRef(page.name)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const saveInFlightRef = useRef(false)
   const needsResaveRef = useRef(false)
@@ -56,7 +59,8 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
   useEffect(() => {
     blocksRef.current = page.blocks
     metaRef.current = page.meta
-  }, [page.blocks, page.meta])
+    nameRef.current = page.name
+  }, [page.blocks, page.meta, page.name])
 
   useEffect(() => {
     const stored = localStorage.getItem(PANEL_STORAGE_KEY)
@@ -136,7 +140,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
         const res = await fetch(`/api/pages/${pageId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ blocks: blocksToSave, meta: metaRef.current }),
+          body: JSON.stringify({ blocks: blocksToSave, meta: metaRef.current, name: nameRef.current }),
         })
 
         if (!res.ok) {
@@ -150,6 +154,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
           const customColors = mergePageCustomColors(updated.meta ?? prev.meta, blocks)
           return {
             ...prev,
+            name: updated.name ?? prev.name,
             meta: { ...(updated.meta ?? prev.meta), customColors },
             updated_at: updated.updated_at,
           }
@@ -178,6 +183,19 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
     }
     void runSave()
   }, [runSave])
+
+  const updatePageName = useCallback(
+    (name: string) => {
+      const trimmed = name.trim()
+      if (!trimmed) return
+      setPage((prev) => {
+        nameRef.current = trimmed
+        return { ...prev, name: trimmed }
+      })
+      scheduleSave()
+    },
+    [scheduleSave],
+  )
 
   const updateBlocks = useCallback(
     (updater: (blocks: BlockInstance[]) => BlockInstance[]) => {
@@ -327,7 +345,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
       fetch(`/api/pages/${pageId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ blocks, meta: metaRef.current }),
+        body: JSON.stringify({ blocks, meta: metaRef.current, name: nameRef.current }),
         keepalive: true,
       }).catch(() => undefined)
     }
@@ -348,11 +366,11 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
         : 'Brouillon · non sauvegardé'
 
   return (
-    <div className="flex h-[100dvh] flex-col bg-[#1A3066]">
-      <header className="flex flex-col gap-3 border-b border-white/10 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+    <div className="flex h-[100dvh] flex-col bg-black">
+      <header className="flex flex-col gap-3 border-b border-white/10 bg-black px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-6">
         <div className="min-w-0">
           <p className="text-xs uppercase tracking-widest text-white/60">LP Studio MVP</p>
-          <h1 className="truncate text-lg font-semibold text-white">{page.name}</h1>
+          <EditablePageTitle value={page.name} onChange={updatePageName} />
         </div>
         <div className="flex flex-wrap items-center gap-2 text-sm sm:gap-3">
           {!saving && !error && lastSavedAt ? (
@@ -381,7 +399,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
         {panelOpen ? (
           <button
             type="button"
-            className="fixed inset-0 z-20 bg-[#1A3066]/50 md:hidden"
+            className="fixed inset-0 z-20 bg-black/50 md:hidden"
             aria-label="Fermer le panneau d'édition"
             onClick={togglePanel}
           />
@@ -389,8 +407,9 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
 
         <aside
           className={[
-            'z-30 flex flex-col overflow-hidden bg-white',
-            'max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:w-[min(100vw,320px)] max-md:shadow-2xl max-md:transition-transform max-md:duration-300',
+            'z-30 flex flex-col overflow-hidden',
+            editorPanel.shell,
+            'max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:w-[min(100vw,320px)] max-md:shadow-2xl max-md:shadow-black/40 max-md:transition-transform max-md:duration-300',
             panelOpen ? 'max-md:translate-x-0' : 'max-md:pointer-events-none max-md:-translate-x-full',
             'md:shrink-0 md:border-r md:border-white/10 md:transition-[width] md:duration-300 md:ease-in-out',
             panelOpen ? 'md:w-[min(100vw,320px)]' : 'md:w-0 md:border-r-0',
@@ -398,12 +417,12 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
           aria-hidden={!panelOpen}
         >
           <div className="flex h-full w-[min(100vw,320px)] flex-col overflow-y-auto">
-            <div className="flex items-center justify-between border-b border-gray-100 px-4 py-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[#5C6B8A]">Édition</p>
+            <div className={`flex items-center justify-between px-4 py-3.5 ${editorPanel.header}`}>
+              <p className={editorPanel.headerLabel}>Édition</p>
               <button
                 type="button"
                 onClick={togglePanel}
-                className="rounded-md p-1.5 text-[#5C6B8A] transition hover:bg-[#E3F2FD] hover:text-[#1A3066]"
+                className={editorPanel.headerButton}
                 title="Rétracter le panneau"
                 aria-label="Rétracter le panneau"
               >
@@ -456,7 +475,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
                 </EditorCollapsibleSection>
               </>
             ) : (
-              <p className="p-4 text-sm text-gray-500">Sélectionnez un bloc pour éditer son contenu, son style et sa typographie.</p>
+              <p className={editorPanel.empty}>Sélectionnez un bloc pour éditer son contenu, son style et sa typographie.</p>
             )}
           </div>
         </aside>
@@ -465,7 +484,7 @@ export function EditorShell({ pageId, initialPage }: EditorShellProps) {
           <button
             type="button"
             onClick={togglePanel}
-            className="absolute left-0 top-1/2 z-20 flex -translate-y-1/2 items-center gap-1 rounded-r-lg border border-l-0 border-[#1A3066]/15 bg-white px-2 py-3 text-xs font-medium text-[#1A3066] shadow-md transition hover:bg-[#E3F2FD]"
+            className={editorPanel.expandButton}
             title="Afficher le panneau d'édition"
             aria-label="Afficher le panneau d'édition"
           >
@@ -545,7 +564,7 @@ function CheckIcon() {
 
 function ChevronLeftIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="text-current" aria-hidden>
       <path d="M15 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   )
