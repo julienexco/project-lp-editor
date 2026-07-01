@@ -1,3 +1,5 @@
+import { ViewportSwitcher } from '@/components/preview/ViewportSwitcher'
+
 export type PreviewViewport = 'desktop' | 'tablet' | 'mobile'
 
 export const PREVIEW_VIEWPORTS: Record<
@@ -37,8 +39,6 @@ export function savePreviewViewport(viewport: PreviewViewport) {
   }
 }
 
-import { ViewportSwitcher } from '@/components/preview/ViewportSwitcher'
-
 type PreviewToolbarProps = {
   viewport: PreviewViewport
   onViewportChange: (viewport: PreviewViewport) => void
@@ -69,9 +69,6 @@ export function PreviewToolbar({
             Éditer
           </button>
         ) : null}
-        <p className="hidden min-w-0 truncate text-xs text-[#5C6B8A] sm:block">
-          Double-clic = style · triple-clic texte = modifier · sauvegarde auto
-        </p>
         {selectedBlockLabel ? (
           <p className="truncate text-xs font-medium text-[#1A3066] sm:hidden">{selectedBlockLabel}</p>
         ) : null}
